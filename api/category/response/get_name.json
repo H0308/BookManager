@@ -1,0 +1,11 @@
+{
+    "code": 0,
+    "errMsg": "",
+    "data": [{
+        "categoryName": "xxx",
+        "categoryCount": 10
+    },{
+        "categoryName": "xxx",
+        "categoryCount": 56
+    }]
+}
