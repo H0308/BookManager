@@ -1,0 +1,8 @@
+{
+    "code": 0,
+    "errMsg": "",
+    "data": {
+        "status": 2,
+        "fine": 42
+    }
+}
