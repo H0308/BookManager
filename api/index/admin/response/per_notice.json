@@ -1,0 +1,11 @@
+{
+    "code": 0,
+    "errMsg": "",
+    "data": {
+        "title": "xxx",
+        "type": 1,
+        "content": "xxxxxx",
+        "username": "xxxx",
+        "publishTime": "2025-10-17T14:30:00"
+    }
+}
