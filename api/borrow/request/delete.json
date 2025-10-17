@@ -1,4 +1,4 @@
 {
     "userId": 1,
-    "borrowId": 2
+    "borrowId": [ 1,2,3 ]
 }
