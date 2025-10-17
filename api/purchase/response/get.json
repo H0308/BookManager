@@ -1,0 +1,13 @@
+{
+    "code": 0,
+    "errMsg": "",
+    "data": [{
+        "username": "xxxx",
+        "phone": "xxxx",
+        "email": "xxxx",
+        "bookName": "xxxx",
+        "purchaseCount": 1,
+        "purchasePrice": 24,
+        "status": 0
+    }]
+}
