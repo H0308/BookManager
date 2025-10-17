@@ -1,0 +1,25 @@
+{
+    "code": 0,
+    "errMsg": "",
+    "data": [{
+        "bookName": "xxx",
+        "isbn": 148648779978,
+        "author": "xxx",
+        "publisher": "xxxx",
+        "category": "xxxxx",
+        "totalCount": 10,
+        "availableCount": 9,
+        "price": 45.2,
+        "status": 0
+    }, {
+        "bookName": "xxx",
+        "isbn": 14864873668,
+        "author": "xxx",
+        "publisher": "xxxx",
+        "category": "xxxxx",
+        "totalCount": 10,
+        "availableCount": 9,
+        "price": 45.2,
+        "status": 0
+    }]
+}

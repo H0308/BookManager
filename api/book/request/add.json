@@ -1,0 +1,9 @@
+{
+    "bookName": "xxx",
+    "isbn": 44678545678,
+    "author": "xxx",
+    "publisher": "xxx",
+    "categoryId": 2,
+    "totalCount": 10,
+    "price": 20.5
+}
