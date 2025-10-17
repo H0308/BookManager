@@ -1,0 +1,15 @@
+{
+    "code": 0,
+    "errMsg": "",
+    "data": [{
+        "username": "xxxx",
+        "phone": "xxxx",
+        "email": "xxxx",
+        "totalBill": 456
+    }, {
+        "username": "xxxx",
+        "phone": "xxxx",
+        "email": "xxxx",
+        "totalBill": 456
+    }]
+}
