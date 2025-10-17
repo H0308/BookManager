@@ -1,0 +1,18 @@
+{
+    "code": 0,
+    "errMsg": "",
+    "data": [
+        {
+            "username": "xxxx",
+            "phone": "xxxx",
+            "email": "xxxx",
+            "role": "xxxx"
+        },
+        {
+            "username": "xxxx",
+            "phone": "xxxx",
+            "email": "xxxx",
+            "role": "xxxx"
+        }
+    ]
+}
