@@ -1,0 +1,23 @@
+{
+    "code": 0,
+    "errMsg": "",
+    "data": [{
+        "username": "xxxx",
+        "phone": "15685642147",
+        "userIdCard": "42112456489722",
+        "email": "22@qq.com",
+        "address": "xxxx",
+        "status": 0,
+        "borrowCount": 10,
+        "purchaseCount": 20
+    }, {
+        "username": "xxxx",
+        "phone": "15685642147",
+        "userIdCard": "42112456489722",
+        "email": "22@qq.com",
+        "address": "xxxx",
+        "status": 0,
+        "borrowCount": 10,
+        "purchaseCount": 20
+    }]
+}
