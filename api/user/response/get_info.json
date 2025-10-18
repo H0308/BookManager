@@ -1,0 +1,14 @@
+{
+    "code": 0,
+    "errMsg": "",
+    "data": {
+        "username": "xxxx",
+        "password": "xxxx",
+        "phone": "xxxx",
+        "user_id_card": "xxxx",
+        "email": "xxxx",
+        "address": "xxxx",
+        "avatar": "xxxx",
+        "role": "xxxx"
+    }
+}
