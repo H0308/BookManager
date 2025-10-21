@@ -27,4 +27,5 @@ public record Constants() {
     public static final String RESOURCE_NOT_FOUND_MESSAGE = "资源不存在";
 
     public static final long REDIS_EXPIRE_TIMEOUT = 14 * 24 * 60 * 60; // 2周，单位为s
+    public static final long REAL_DELETE_EXAMINE_TIMEOUT = 3 * 24 * 60 * 60 * 1000;
 }

@@ -3,6 +3,7 @@ package org.epsda.bookmanager.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
+import org.epsda.bookmanager.constants.Constants;
 import org.epsda.bookmanager.exception.BookManagerException;
 import org.epsda.bookmanager.mapper.BookMapper;
 import org.epsda.bookmanager.mapper.BorrowRecordMapper;
@@ -16,11 +17,13 @@ import org.epsda.bookmanager.pojo.response.BookWithAvailableCount;
 import org.epsda.bookmanager.pojo.response.QueryBookResp;
 import org.epsda.bookmanager.service.BookService;
 import org.epsda.bookmanager.utils.BeanUtil;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -113,6 +116,16 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public Boolean addBook(Book book) {
+        // 先查询是否有标记为被删除的书籍
+        LambdaQueryWrapper<Book> wrapper = new LambdaQueryWrapper<Book>().eq(Book::getIsbn, book.getIsbn()).eq(Book::getDeleteFlag, 1);
+        Book existed = bookMapper.selectOne(wrapper);
+        if (existed != null) {
+            // 说明存在虚拟删除的书籍，此时只需要更新状态值即可
+            Book newBook = new Book();
+            newBook.setDeleteFlag(0);
+            return bookMapper.update(newBook, new LambdaQueryWrapper<Book>().eq(Book::getIsbn, book.getIsbn())) == 1;
+        }
+
         return bookMapper.insert(book) == 1;
     }
 
@@ -164,5 +177,27 @@ public class BookServiceImpl implements BookService {
         }
 
         return count == bookIds.size();
+    }
+
+    // 实际删除
+    @Scheduled(fixedDelay = Constants.REAL_DELETE_EXAMINE_TIMEOUT)
+    public void realBatchDelete() {
+        // 查找到超过三天时间且删除标记为“已删除”的书籍
+        List<Book> books = bookMapper.selectList(new LambdaQueryWrapper<Book>().eq(Book::getDeleteFlag, 1));
+        if (books != null && !books.isEmpty()) {
+            for (var book : books) {
+                // 获取到时间
+                LocalDateTime updateTime = book.getUpdateTime();
+                LocalDateTime now = LocalDateTime.now();
+                long between = ChronoUnit.DAYS.between(updateTime, now);
+                // 日期间隔3天进行删除
+                if (between >= 3) {
+                    int ret = bookMapper.delete(new LambdaQueryWrapper<Book>().eq(Book::getId, book.getId()));
+                    if (ret != 1) {
+                        log.info("删除id为：{}的书籍失败", book.getId());
+                    }
+                }
+            }
+        }
     }
 }
