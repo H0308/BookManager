@@ -1,0 +1,47 @@
+spring:
+  application:
+    name: book-manager
+  datasource:
+    url: jdbc:mysql://localhost:3306/book_manager?characterEncoding=utf8&useSSL=false
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  rabbitmq:
+    addresses: amqp://admin:admin@47.113.217.80:5670/blog
+    listener:
+      simple:
+        acknowledge-mode: manual # 手动确认
+  data:
+    redis:
+      host: 47.113.217.80
+      port: 6376
+      timeout: 60s
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: 5s
+  mail:
+    host: smtp.qq.com
+    username: 1848312235@qq.com
+    password: hmkotlztyewmeahh
+    port: 465
+    properties:
+      mail.smtp.ssl.enable: true
+      personal: "图书管理系统"
+  ai:
+    openai:
+      api-key: sk-4ab5979b46f24e55b944d7cf278f0199
+      base-url: https://api.deepseek.com
+      chat:
+        options:
+          model: deepseek-chat
+          temperature: 0.7
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+avatar:
+  upload:
+    path: E:\BookManager\backend\images

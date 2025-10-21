@@ -1,0 +1,30 @@
+package org.epsda.bookmanager.constants;
+
+/**
+ * Created with IntelliJ IDEA.
+ * Description:
+ * User: 18483
+ * Date: 2025/10/21
+ * Time: 9:06
+ *
+ * @Author: 憨八嘎
+ */
+public record Constants() {
+    public static final String TOKEN_HEADER = "user_login_header_token";
+    public static final String USER_INFO_REDIS_PREFIX = "user";
+    public static final String BLOG_INFO_REDIS_PREFIX = "blog";
+    public static final String REDIS_NAMESPACE_SEP = ":";
+    public static final String REDIS_DEFAULT_PREFIX = "redis";
+    public static final String RABBITMQ_USER_QUEUE = "user_queue";
+    public static final String RABBITMQ_USER_EXCHANGE = "user_exchange";
+
+    public static final Integer NORMAL = 0;
+    public static final Integer SERVER_ERROR = 1;
+    public static final Integer SYSTEM_ERROR = 2;
+    public static final Integer RESOURCE_NOT_FOUND = 3;
+    public static final String SERVER_ERROR_MESSAGE = "服务器异常";
+    public static final String SYSTEM_ERROR_MESSAGE = "博客系统异常";
+    public static final String RESOURCE_NOT_FOUND_MESSAGE = "资源不存在";
+
+    public static final long REDIS_EXPIRE_TIMEOUT = 14 * 24 * 60 * 60; // 2周，单位为s
+}
