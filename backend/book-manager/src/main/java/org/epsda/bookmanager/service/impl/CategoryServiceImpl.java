@@ -2,8 +2,10 @@ package org.epsda.bookmanager.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.epsda.bookmanager.constants.Constants;
 import org.epsda.bookmanager.exception.BookManagerException;
 import org.epsda.bookmanager.mapper.CategoryMapper;
+import org.epsda.bookmanager.pojo.Book;
 import org.epsda.bookmanager.pojo.Category;
 import org.epsda.bookmanager.pojo.request.QueryCategoryReq;
 import org.epsda.bookmanager.pojo.response.QueryCategoryResp;
@@ -39,7 +41,8 @@ public class CategoryServiceImpl implements CategoryService {
         Page<Category> categoryPage = new Page<>(pageNum, pageSize);
 
         LambdaQueryWrapper<Category> wrapper = new LambdaQueryWrapper<>();
-        wrapper.like(StringUtils.hasText(queryCategoryReq.getCategoryName()), Category::getCategoryName, queryCategoryReq.getCategoryName());
+        wrapper.like(StringUtils.hasText(queryCategoryReq.getCategoryName()), Category::getCategoryName, queryCategoryReq.getCategoryName())
+                .eq(Category::getDeleteFlag, Constants.NOT_DELETE_FIELD_FLAG);
 
         Page<Category> pages = categoryMapper.selectPage(categoryPage, wrapper);
         List<Category> records = pages.getRecords();
@@ -51,16 +54,16 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public Boolean addCategory(Category category) {
         // 是否存在过指定的书籍
-        Category existedNotDeleted = categoryMapper.selectOne(new LambdaQueryWrapper<Category>().eq(Category::getCategoryName, category.getCategoryName()).eq(Category::getDeleteFlag, 0));
+        Category existedNotDeleted = categoryMapper.selectOne(new LambdaQueryWrapper<Category>().eq(Category::getCategoryName, category.getCategoryName()).eq(Category::getDeleteFlag, Constants.NOT_DELETE_FIELD_FLAG));
         if (existedNotDeleted != null) {
             throw new BookManagerException("已经存在指定的分类，插入失败");
         }
 
-        // 需要判断新增的分类是否存在过
-        Category deleted = categoryMapper.selectOne(new LambdaQueryWrapper<Category>().eq(Category::getCategoryName, category.getCategoryName()).eq(Category::getDeleteFlag, 1));
+        // 需要判断新增的分类是否存在过但是处于删除状态
+        Category deleted = categoryMapper.selectOne(new LambdaQueryWrapper<Category>().eq(Category::getCategoryName, category.getCategoryName()).eq(Category::getDeleteFlag, Constants.DELETED_FIELD_FLAG));
         if (deleted != null) {
             Category newCategory = new Category();
-            newCategory.setDeleteFlag(0);
+            newCategory.setDeleteFlag(Constants.NOT_DELETE_FIELD_FLAG);
             return categoryMapper.update(newCategory, new LambdaQueryWrapper<Category>().eq(Category::getCategoryName, category.getCategoryName())) == 1;
         }
 
@@ -74,7 +77,7 @@ public class CategoryServiceImpl implements CategoryService {
             throw new BookManagerException("图书分类名称为空，修改失败");
         }
 
-        return categoryMapper.update(category, new LambdaQueryWrapper<Category>().eq(Category::getId, category.getId())) == 1;
+        return categoryMapper.update(category, new LambdaQueryWrapper<Category>().eq(Category::getId, category.getId()).eq(Category::getDeleteFlag, Constants.NOT_DELETE_FIELD_FLAG)) == 1;
     }
 
     @Override
@@ -89,7 +92,26 @@ public class CategoryServiceImpl implements CategoryService {
         if (category.getCategoryCount() != 0) {
             throw new BookManagerException("当前分类下存在图书，无法删除");
         }
-        category.setDeleteFlag(1);
+
+        // 检查该分类是否已经被标记为删除
+        if (Constants.DELETED_FIELD_FLAG.equals(category.getDeleteFlag())) {
+            throw new BookManagerException("该分类已经删除，删除失败");
+        }
+
+        category.setDeleteFlag(Constants.DELETED_FIELD_FLAG);
         return categoryMapper.update(category, new LambdaQueryWrapper<Category>().eq(Category::getId, categoryId)) == 1;
+    }
+
+    @Override
+    public Boolean batchDeleteCategories(List<Long> categoryIds) {
+        var count = 0;
+        for (var categoryId : categoryIds) {
+            Boolean ret = deleteCategory(categoryId);
+            if (ret) {
+                count++;
+            }
+        }
+
+        return count == categoryIds.size();
     }
 }

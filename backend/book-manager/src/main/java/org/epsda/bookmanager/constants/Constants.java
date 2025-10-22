@@ -28,4 +28,7 @@ public record Constants() {
 
     public static final long REDIS_EXPIRE_TIMEOUT = 14 * 24 * 60 * 60; // 2周，单位为s
     public static final long REAL_DELETE_EXAMINE_TIMEOUT = 3 * 24 * 60 * 60 * 1000;
+
+    public static final Integer DELETED_FIELD_FLAG = 1;
+    public static final Integer NOT_DELETE_FIELD_FLAG = 0;
 }

@@ -45,3 +45,5 @@ mybatis-plus:
 avatar:
   upload:
     path: E:\BookManager\backend\images
+admin:
+  adminName: book_admin_001

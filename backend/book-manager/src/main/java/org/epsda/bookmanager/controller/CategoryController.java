@@ -12,7 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -53,5 +56,10 @@ public class CategoryController {
     @RequestMapping("/delete")
     public ResultWrapper<Boolean> deleteCategory(@NotNull Long categoryId) {
         return ResultWrapper.normal(categoryService.deleteCategory(categoryId));
+    }
+
+    @RequestMapping("/batchDelete")
+    public ResultWrapper<Boolean> batchDeleteCategories(@RequestParam List<Long> categoryIds) {
+        return ResultWrapper.normal(categoryService.batchDeleteCategories(categoryIds));
     }
 }

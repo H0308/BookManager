@@ -7,6 +7,8 @@ import org.epsda.bookmanager.pojo.Category;
 import org.epsda.bookmanager.pojo.request.QueryCategoryReq;
 import org.epsda.bookmanager.pojo.response.QueryCategoryResp;
 
+import java.util.List;
+
 /**
  * Created with IntelliJ IDEA.
  * Description:
@@ -26,4 +28,6 @@ public interface CategoryService {
     Category getCategoryById(Long categoryId);
 
     Boolean deleteCategory(@NotNull Long categoryId);
+
+    Boolean batchDeleteCategories(List<Long> categoryIds);
 }

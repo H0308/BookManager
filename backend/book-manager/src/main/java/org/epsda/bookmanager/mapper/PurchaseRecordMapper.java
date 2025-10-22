@@ -22,4 +22,7 @@ public interface PurchaseRecordMapper extends BaseMapper<PurchaseRecord> {
     // 根据book_id进行查询出未支付的图书
     @Select("select * from purchase_record where book_id = #{bookId} and status = 0")
     List<BorrowRecord> getPurchaseRecordByBookId(Long bookId);
+    // 根据user_id进行查询出未支付的图书
+    @Select("select * from purchase_record where user_id = #{userId} and status = 0")
+    List<BorrowRecord> getPurchaseRecordByUserId(Long userId);
 }
