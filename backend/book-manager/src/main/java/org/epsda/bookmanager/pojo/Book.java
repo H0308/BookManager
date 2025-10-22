@@ -37,7 +37,7 @@ public class Book {
     @Length(message = "出版社最长不超过50位", max = 50)
     private String publisher;
     @NotNull
-    private Integer categoryId;
+    private Long categoryId;
     @NotNull
     private Integer totalCount;
     @NotNull

@@ -7,6 +7,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
+import java.time.LocalDateTime;
+
 /**
  * Created with IntelliJ IDEA.
  * Description:
@@ -24,5 +26,8 @@ public class Category {
     @NotNull
     @Length(max = 20, message = "分类名称最长不超过20位")
     private String categoryName;
-    private String categoryCount;
+    private Integer categoryCount;
+    private Integer deleteFlag;
+    private LocalDateTime createTime;
+    private LocalDateTime updateTime;
 }

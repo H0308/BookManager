@@ -13,7 +13,7 @@ import org.epsda.bookmanager.pojo.Book;
 import org.epsda.bookmanager.pojo.BorrowRecord;
 import org.epsda.bookmanager.pojo.Category;
 import org.epsda.bookmanager.pojo.request.QueryBookReq;
-import org.epsda.bookmanager.pojo.response.BookWithAvailableCount;
+import org.epsda.bookmanager.pojo.response.vo.BookResp;
 import org.epsda.bookmanager.pojo.response.QueryBookResp;
 import org.epsda.bookmanager.service.BookService;
 import org.epsda.bookmanager.utils.BeanUtil;
@@ -64,7 +64,7 @@ public class BookServiceImpl implements BookService {
         String categoryName = queryBookReq.getCategoryName();
         List<Long> categoryIds = new ArrayList<>();
         categoryIds.add(0L); // id in [0]，确保没有通过分类查找到数据时不会返回所有数据
-        if (StringUtils.hasLength(categoryName)) {
+        if (StringUtils.hasText(categoryName)) {
             List<Category> categories = categoryMapper.selectCategoryLikeCategoryName(categoryName);
             if (!categories.isEmpty()) {
                 // 转换为ID集合
@@ -72,18 +72,18 @@ public class BookServiceImpl implements BookService {
             }
         }
         // 五种查询条件
-        wrapper.like(StringUtils.hasLength(bookName), Book::getBookName, bookName)
-                .like(StringUtils.hasLength(isbn), Book::getIsbn, isbn)
-                .like(StringUtils.hasLength(author), Book::getAuthor, author)
-                .like(StringUtils.hasLength(publisher), Book::getPublisher, publisher)
-                .in(StringUtils.hasLength(categoryName) && !categoryIds.isEmpty(),
+        wrapper.like(StringUtils.hasText(bookName), Book::getBookName, bookName)
+                .like(StringUtils.hasText(isbn), Book::getIsbn, isbn)
+                .like(StringUtils.hasText(author), Book::getAuthor, author)
+                .like(StringUtils.hasText(publisher), Book::getPublisher, publisher)
+                .in(StringUtils.hasText(categoryName) && !categoryIds.isEmpty(),
                         Book::getCategoryId, categoryIds)
                 .eq(Book::getDeleteFlag, 0);
 
         Page<Book> bookPage = bookMapper.selectPage(page, wrapper);
 
         List<Book> allBooks = bookPage.getRecords();
-        List<BookWithAvailableCount> availables = new ArrayList<>();
+        List<BookResp> availables = new ArrayList<>();
         // 需要设置图书是否被借阅或者被购买，计算出可用量
         for (var book : allBooks) {
             // 得到借阅量
@@ -105,10 +105,10 @@ public class BookServiceImpl implements BookService {
             }
             // 计算可用量
             int availableCount = totalCount - borrows - purchases;
-            BookWithAvailableCount bookWithAvailableCount = BeanUtil.convert(book);
-            bookWithAvailableCount.setAvailableCount(availableCount);
-            bookWithAvailableCount.setCategory(categoryMapper.selectById(book.getCategoryId()).getCategoryName());
-            availables.add(bookWithAvailableCount);
+            BookResp bookResp = BeanUtil.convert(book);
+            bookResp.setAvailableCount(availableCount);
+            bookResp.setCategory(categoryMapper.selectById(book.getCategoryId()).getCategoryName());
+            availables.add(bookResp);
         }
 
         return new QueryBookResp(bookPage.getCurrent(), bookPage.getPages(), bookPage.getTotal(), availables);
@@ -116,17 +116,29 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public Boolean addBook(Book book) {
+        // 查看是否已经有存在的书籍
+        LambdaQueryWrapper<Book> isbnWrapper = new LambdaQueryWrapper<Book>().eq(Book::getIsbn, book.getIsbn());
+        Book existedNotDeleted = bookMapper.selectOne(isbnWrapper.eq(Book::getDeleteFlag, 0));
+        if (existedNotDeleted != null) {
+            // 存在时直接更新图书数量
+            existedNotDeleted.setTotalCount(existedNotDeleted.getTotalCount() + 1);
+            return bookMapper.update(existedNotDeleted, isbnWrapper) == 1;
+        }
+
         // 先查询是否有标记为被删除的书籍
         LambdaQueryWrapper<Book> wrapper = new LambdaQueryWrapper<Book>().eq(Book::getIsbn, book.getIsbn()).eq(Book::getDeleteFlag, 1);
-        Book existed = bookMapper.selectOne(wrapper);
-        if (existed != null) {
+        Book deleted = bookMapper.selectOne(wrapper);
+        if (deleted != null) {
             // 说明存在虚拟删除的书籍，此时只需要更新状态值即可
             Book newBook = new Book();
             newBook.setDeleteFlag(0);
-            return bookMapper.update(newBook, new LambdaQueryWrapper<Book>().eq(Book::getIsbn, book.getIsbn())) == 1;
+            boolean bookUpdate = bookMapper.update(newBook, wrapper) == 1;
+            // 增加对应分类的图书数量
+            return bookUpdate && bookAddDeleteChangeCategoryCount(deleted.getCategoryId(), true);
         }
 
-        return bookMapper.insert(book) == 1;
+        boolean bookUpdate = bookMapper.insert(book) == 1;
+        return bookUpdate && bookAddDeleteChangeCategoryCount(book.getCategoryId(), true);
     }
 
     @Override
@@ -155,11 +167,18 @@ public class BookServiceImpl implements BookService {
             throw new BookManagerException("当前图书有读者预购，无法删除");
         }
 
-        // 上面两种情况都没有时可以删除图书
+        LambdaQueryWrapper<Book> wrapper = new LambdaQueryWrapper<Book>().eq(Book::getId, bookId);
+        // 再判断图书是否是处于虚拟删除
+        Book book = bookMapper.selectOne(wrapper);
+        if (book.getDeleteFlag() == 1) {
+            throw new BookManagerException("图书已经删除，无法再次删除");
+        }
+
+        // 上面三种情况都没有时可以删除图书，同时还要修改对应分类的数量
         Book deleted = new Book();
         deleted.setDeleteFlag(1);
-        LambdaQueryWrapper<Book> wrapper = new LambdaQueryWrapper<Book>().eq(Book::getId, bookId);
-        return bookMapper.update(deleted, wrapper) == 1;
+        Long categoryId = book.getCategoryId();
+        return bookMapper.update(deleted, wrapper) == 1 && bookAddDeleteChangeCategoryCount(categoryId, false);
     }
 
     @Override
@@ -180,7 +199,7 @@ public class BookServiceImpl implements BookService {
     }
 
     // 实际删除
-    @Scheduled(fixedDelay = Constants.REAL_DELETE_EXAMINE_TIMEOUT)
+    // @Scheduled(fixedDelay = Constants.REAL_DELETE_EXAMINE_TIMEOUT)
     public void realBatchDelete() {
         // 查找到超过三天时间且删除标记为“已删除”的书籍
         List<Book> books = bookMapper.selectList(new LambdaQueryWrapper<Book>().eq(Book::getDeleteFlag, 1));
@@ -200,4 +219,16 @@ public class BookServiceImpl implements BookService {
             }
         }
     }
+
+    private Boolean bookAddDeleteChangeCategoryCount(Long categoryId, Boolean addFlag) {
+        LambdaQueryWrapper<Category> categoryWrapper = new LambdaQueryWrapper<Category>().eq(Category::getId, categoryId);
+        Category category = categoryMapper.selectOne(categoryWrapper);
+        if (addFlag) {
+            category.setCategoryCount(category.getCategoryCount() + 1);
+        } else {
+            category.setCategoryCount(category.getCategoryCount() - 1);
+        }
+        return categoryMapper.update(category, categoryWrapper) == 1;
+    }
+
 }

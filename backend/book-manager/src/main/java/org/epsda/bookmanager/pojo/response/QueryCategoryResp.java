@@ -2,7 +2,8 @@ package org.epsda.bookmanager.pojo.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.epsda.bookmanager.pojo.response.vo.BookResp;
+import lombok.NoArgsConstructor;
+import org.epsda.bookmanager.pojo.response.vo.CategoryResp;
 
 import java.util.List;
 
@@ -11,15 +12,16 @@ import java.util.List;
  * Description:
  * User: 18483
  * Date: 2025/10/21
- * Time: 10:28
+ * Time: 23:07
  *
  * @Author: 憨八嘎
  */
 @Data
 @AllArgsConstructor
-public class QueryBookResp {
+@NoArgsConstructor
+public class QueryCategoryResp {
     private Long currentPage;
     private Long totalPages;
     private Long totalCount;
-    private List<BookResp> currentBooks;
+    private List<CategoryResp> currentCategories;
 }

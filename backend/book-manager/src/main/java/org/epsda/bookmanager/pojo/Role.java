@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 @Data
 public class Role {
     @NotNull
+    @TableId(type = IdType.INPUT)
     private Integer id;
     @NotNull
     @Length(max = 20, message = "角色描述最长不超过20位")

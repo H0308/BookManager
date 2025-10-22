@@ -1,7 +1,6 @@
-package org.epsda.bookmanager.pojo.response;
+package org.epsda.bookmanager.pojo.response.vo;
 
 import lombok.Data;
-import org.epsda.bookmanager.pojo.Book;
 
 import java.math.BigDecimal;
 
@@ -15,7 +14,7 @@ import java.math.BigDecimal;
  * @Author: 憨八嘎
  */
 @Data
-public class BookWithAvailableCount {
+public class BookResp {
     private String bookName;
     private String isbn;
     private String author;
