@@ -29,6 +29,17 @@ public record Constants() {
     public static final long REDIS_EXPIRE_TIMEOUT = 14 * 24 * 60 * 60; // 2周，单位为s
     public static final long REAL_DELETE_EXAMINE_TIMEOUT = 3 * 24 * 60 * 60 * 1000;
 
-    public static final Integer DELETED_FIELD_FLAG = 1;
     public static final Integer NOT_DELETE_FIELD_FLAG = 0;
+    public static final Integer DELETED_FIELD_FLAG = 1;
+
+    public static final Integer BORROWING_FLAG = 0;
+    public static final Integer RETURN_FLAG = 1;
+    public static final Integer OVERDUE_FLAG = 2;
+
+    public static final Integer BORROW_TIME_DESC = 0; // 借阅日期
+    public static final Integer PRE_RETURN_TIME_DESC = 1; // 应还日期
+    public static final Integer REAL_RETURN_TIME_DESC = 2; // 实际归还日期
+
+    public static final Integer BOOK_AVAILABLE_FLAG = 0;
+    public static final Integer BOOK_UNAVAILABLE_FLAG = 1;
 }

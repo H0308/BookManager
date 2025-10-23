@@ -67,4 +67,8 @@ public class BookController {
         return ResultWrapper.normal(bookService.batchDeleteBook(bookIds));
     }
 
+    @RequestMapping("/getAvailableCount")
+    public ResultWrapper<Integer> getAvailableCount(@Validated @RequestBody Book book) {
+        return ResultWrapper.normal(bookService.getAvailableCount(book));
+    }
 }

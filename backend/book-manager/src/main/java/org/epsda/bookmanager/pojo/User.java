@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 @Data
 public class User {
     @TableId(type = IdType.AUTO)
-    private Integer id;
+    private Long id;
     @NotNull
     @Length(max = 20, message = "用户名最长不超过20位")
     private String username;

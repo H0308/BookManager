@@ -26,7 +26,9 @@ public interface BookService {
 
     Book getBookById(Long id);
 
-    Boolean deleteBook(@NotNull Long id);
+    Boolean deleteBook(Long id);
 
     Boolean batchDeleteBook(List<Long> bookIds);
+
+    Integer getAvailableCount(Book book);
 }

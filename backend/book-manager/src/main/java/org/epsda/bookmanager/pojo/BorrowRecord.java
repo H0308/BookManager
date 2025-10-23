@@ -22,15 +22,16 @@ import java.time.LocalDateTime;
 @TableName("borrow_record")
 public class BorrowRecord {
     @TableId(type = IdType.AUTO)
-    private Integer id;
+    private Long id;
     @NotNull
-    private Integer userId;
+    private Long userId;
     @NotNull
-    private Integer bookId;
+    private Long bookId;
     private LocalDateTime borrowTime;
     @NotNull
     private LocalDateTime preReturnTime;
     private LocalDateTime realReturnTime;
+    // 状态和罚金不显示在编辑窗口中
     private Integer status;
     private BigDecimal fine;
     private Integer deleteFlag;

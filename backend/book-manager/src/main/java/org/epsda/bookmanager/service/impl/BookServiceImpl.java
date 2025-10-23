@@ -66,7 +66,7 @@ public class BookServiceImpl implements BookService {
         categoryIds.add(0L); // id in [0]，确保没有通过分类查找到数据时不会返回所有数据
         if (StringUtils.hasText(categoryName)) {
             List<Category> categories = categoryMapper.selectCategoryLikeCategoryName(categoryName);
-            if (!categories.isEmpty()) {
+            if (categories != null && !categories.isEmpty()) {
                 // 转换为ID集合
                 categoryIds = categories.stream().map(Category::getId).toList();
             }
@@ -76,8 +76,7 @@ public class BookServiceImpl implements BookService {
                 .like(StringUtils.hasText(isbn), Book::getIsbn, isbn)
                 .like(StringUtils.hasText(author), Book::getAuthor, author)
                 .like(StringUtils.hasText(publisher), Book::getPublisher, publisher)
-                .in(StringUtils.hasText(categoryName) && !categoryIds.isEmpty(),
-                        Book::getCategoryId, categoryIds)
+                .in(StringUtils.hasText(categoryName), Book::getCategoryId, categoryIds)
                 .eq(Book::getDeleteFlag, Constants.NOT_DELETE_FIELD_FLAG);
 
         Page<Book> bookPage = bookMapper.selectPage(page, wrapper);
@@ -86,27 +85,11 @@ public class BookServiceImpl implements BookService {
         List<BookResp> availables = new ArrayList<>();
         // 需要设置图书是否被借阅或者被购买，计算出可用量
         for (var book : allBooks) {
-            // 得到借阅量
-            List<BorrowRecord> borrowRecordByBookId = borrowRecordMapper.getBorrowRecordByBookId(book.getId());
-            int borrows = 0;
-            if (borrowRecordByBookId != null && !borrowRecordByBookId.isEmpty()) {
-                borrows = borrowRecordByBookId.size();
-            }
-            // 得到购买量
-            int purchases = 0;
-            List<BorrowRecord> purchaseRecordByBookId = purchaseRecordMapper.getPurchaseRecordByBookId(book.getId());
-            if (purchaseRecordByBookId != null && !purchaseRecordByBookId.isEmpty()) {
-                purchases = purchaseRecordByBookId.size();
-            }
-            // 得到总量
-            Integer totalCount = book.getTotalCount();
-            if (!(totalCount > 0)) {
-                continue;
-            }
             // 计算可用量
-            int availableCount = totalCount - borrows - purchases;
+            int availableCount = getAvailableCount(book);
             BookResp bookResp = BeanUtil.convert(book);
             bookResp.setAvailableCount(availableCount);
+            log.info("当前图书：{}的可用数量为：{}", book.getBookName(), availableCount);
             bookResp.setCategory(categoryMapper.selectById(book.getCategoryId()).getCategoryName());
             availables.add(bookResp);
         }
@@ -154,7 +137,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public Boolean deleteBook(Long bookId) {
-        // 先判断当前书籍是否有人借阅（借阅中或者逾期）
+        // 先判断当前书籍是否有人借阅（借阅中）
         List<BorrowRecord> borrowRecordByBookId = borrowRecordMapper.getBorrowRecordByBookId(bookId);
         if (!borrowRecordByBookId.isEmpty()) {
             throw new BookManagerException("当前图书有读者借阅，无法删除");
@@ -192,6 +175,24 @@ public class BookServiceImpl implements BookService {
         }
 
         return count == bookIds.size();
+    }
+
+    @Override
+    public Integer getAvailableCount(Book book) {
+        // 检查图书可用量确保图书状态正确
+        int totalCount = book.getTotalCount();
+        Long bookId = book.getId();
+        List<BorrowRecord> borrowRecordByBookId = borrowRecordMapper.getBorrowRecordByBookId(bookId);
+        int borrows = 0;
+        if (borrowRecordByBookId != null) {
+            borrows = borrowRecordByBookId.size();
+        }
+        List<BorrowRecord> purchaseRecordByBookId = purchaseRecordMapper.getPurchaseRecordByBookId(bookId);
+        int purchases = 0;
+        if (purchaseRecordByBookId != null) {
+            purchases = purchaseRecordByBookId.size();
+        }
+        return totalCount - purchases - borrows;
     }
 
     // 实际删除

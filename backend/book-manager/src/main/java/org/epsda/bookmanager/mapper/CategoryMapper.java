@@ -20,6 +20,6 @@ import java.util.List;
 public interface CategoryMapper extends BaseMapper<Category> {
 
     // 根据分类名称获取到分类
-    @Select("select * from category where category_name like CONCAT('%', #{categoryName}, '%')")
+    @Select("select * from category where category_name like concat('%', #{categoryName}, '%')")
     List<Category> selectCategoryLikeCategoryName(String categoryName);
 }

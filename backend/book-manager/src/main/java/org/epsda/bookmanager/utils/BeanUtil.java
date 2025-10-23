@@ -2,9 +2,11 @@ package org.epsda.bookmanager.utils;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.SneakyThrows;
+import org.epsda.bookmanager.pojo.response.vo.BorrowRecordResp;
 import org.springframework.beans.BeanUtils;
-
 import java.lang.reflect.Constructor;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 /**
 * Created with IntelliJ IDEA.
@@ -37,17 +39,27 @@ public class BeanUtil {
         return returnResp;
     }
 
-    // public static BookResp convert(@NotNull Book book) {
-    //     BookResp bookResp = new BookResp();
-    //     // 通过BeanUtils进行转换
-    //     BeanUtils.copyProperties(book, bookResp);
-    //     return bookResp;
-    // }
-    //
-    // public static CategoryResp convert(@NotNull Category category) {
-    //     CategoryResp categoryResp = new CategoryResp();
-    //     // 通过BeanUtils进行转换
-    //     BeanUtils.copyProperties(category, categoryResp);
-    //     return categoryResp;
-    // }
+    public static BorrowRecordResp generateBorrowRecordResp(String username,
+                                                            String phone,
+                                                            String email,
+                                                            String BookName,
+                                                            String isbn,
+                                                            LocalDateTime borrowTime,
+                                                            LocalDateTime preReturnTime,
+                                                            LocalDateTime realReturnTime,
+                                                            Integer status,
+                                                            BigDecimal fine) {
+        BorrowRecordResp borrowRecordResp = new BorrowRecordResp();
+        borrowRecordResp.setUsername(username);
+        borrowRecordResp.setEmail(email);
+        borrowRecordResp.setPhone(phone);
+        borrowRecordResp.setBookName(BookName);
+        borrowRecordResp.setIsbn(isbn);
+        borrowRecordResp.setBorrowTime(borrowTime);
+        borrowRecordResp.setPreReturnTime(preReturnTime);
+        borrowRecordResp.setRealReturnTime(realReturnTime);
+        borrowRecordResp.setStatus(status);
+        borrowRecordResp.setFine(fine);
+        return borrowRecordResp;
+    }
 }

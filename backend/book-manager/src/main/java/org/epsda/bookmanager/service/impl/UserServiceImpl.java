@@ -83,6 +83,11 @@ public class UserServiceImpl implements UserService {
         if (existed != null) {
             throw new BookManagerException("此邮箱已经注册，请更换邮箱");
         }
+        LambdaQueryWrapper<User> phoneWrapper = new LambdaQueryWrapper<User>().eq(User::getPhone, user.getPhone());
+        existed = userMapper.selectOne(phoneWrapper);
+        if (existed != null) {
+            throw new BookManagerException("此电话已经注册，请更换电话");
+        }
 
         LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<User>().eq(User::getUserIdCard, user.getUserIdCard()).eq(User::getDeleteFlag, Constants.DELETED_FIELD_FLAG);
         User deleted = userMapper.selectOne(wrapper);
