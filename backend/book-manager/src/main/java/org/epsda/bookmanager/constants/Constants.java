@@ -42,4 +42,7 @@ public record Constants() {
 
     public static final Integer BOOK_AVAILABLE_FLAG = 0;
     public static final Integer BOOK_UNAVAILABLE_FLAG = 1;
+
+    public static final Integer BOOK_UNPAID_FLAG = 0;
+    public static final Integer BOOK_PAID_FLAG = 1;
 }

@@ -3,6 +3,7 @@ package org.epsda.bookmanager.utils;
 import jakarta.validation.constraints.NotNull;
 import lombok.SneakyThrows;
 import org.epsda.bookmanager.pojo.response.vo.BorrowRecordResp;
+import org.epsda.bookmanager.pojo.response.vo.PurchaseRecordResp;
 import org.springframework.beans.BeanUtils;
 import java.lang.reflect.Constructor;
 import java.math.BigDecimal;
@@ -61,5 +62,24 @@ public class BeanUtil {
         borrowRecordResp.setStatus(status);
         borrowRecordResp.setFine(fine);
         return borrowRecordResp;
+    }
+
+    public static PurchaseRecordResp generatePurchaseRecordResp(String username,
+                                                                String phone,
+                                                                String email,
+                                                                String BookName,
+                                                                Integer status,
+                                                                Integer purchaseCount,
+                                                                BigDecimal purchasePrice) {
+        PurchaseRecordResp purchaseRecordResp = new PurchaseRecordResp();
+        purchaseRecordResp.setUsername(username);
+        purchaseRecordResp.setEmail(email);
+        purchaseRecordResp.setPhone(phone);
+        purchaseRecordResp.setBookName(BookName);
+        purchaseRecordResp.setStatus(status);
+        purchaseRecordResp.setPurchaseCount(purchaseCount);
+        purchaseRecordResp.setPurchasePrice(purchasePrice);
+
+        return purchaseRecordResp;
     }
 }

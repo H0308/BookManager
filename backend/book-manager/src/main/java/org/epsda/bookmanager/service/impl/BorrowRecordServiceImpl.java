@@ -6,7 +6,6 @@ import org.epsda.bookmanager.constants.Constants;
 import org.epsda.bookmanager.exception.BookManagerException;
 import org.epsda.bookmanager.mapper.BookMapper;
 import org.epsda.bookmanager.mapper.BorrowRecordMapper;
-import org.epsda.bookmanager.mapper.PurchaseRecordMapper;
 import org.epsda.bookmanager.mapper.UserMapper;
 import org.epsda.bookmanager.pojo.Book;
 import org.epsda.bookmanager.pojo.BorrowRecord;

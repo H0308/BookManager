@@ -12,6 +12,7 @@ import org.epsda.bookmanager.mapper.PurchaseRecordMapper;
 import org.epsda.bookmanager.pojo.Book;
 import org.epsda.bookmanager.pojo.BorrowRecord;
 import org.epsda.bookmanager.pojo.Category;
+import org.epsda.bookmanager.pojo.PurchaseRecord;
 import org.epsda.bookmanager.pojo.request.QueryBookReq;
 import org.epsda.bookmanager.pojo.response.vo.BookResp;
 import org.epsda.bookmanager.pojo.response.QueryBookResp;
@@ -145,7 +146,7 @@ public class BookServiceImpl implements BookService {
 
         // 判断有人是否已经预定
         // 不需要考虑已支付，因为书已经到读者手上了
-        List<BorrowRecord> purchaseRecordByBookId = purchaseRecordMapper.getPurchaseRecordByBookId(bookId);
+        List<PurchaseRecord> purchaseRecordByBookId = purchaseRecordMapper.getPurchaseRecordByBookId(bookId);
         if (!purchaseRecordByBookId.isEmpty()) {
             throw new BookManagerException("当前图书有读者预购，无法删除");
         }
@@ -187,10 +188,12 @@ public class BookServiceImpl implements BookService {
         if (borrowRecordByBookId != null) {
             borrows = borrowRecordByBookId.size();
         }
-        List<BorrowRecord> purchaseRecordByBookId = purchaseRecordMapper.getPurchaseRecordByBookId(bookId);
+        List<PurchaseRecord> purchaseRecordByBookId = purchaseRecordMapper.getPurchaseRecordByBookId(bookId);
         int purchases = 0;
         if (purchaseRecordByBookId != null) {
-            purchases = purchaseRecordByBookId.size();
+            for (var purchaseRecord : purchaseRecordByBookId) {
+                purchases += purchaseRecord.getPurchaseCount();
+            }
         }
         return totalCount - purchases - borrows;
     }

@@ -7,7 +7,7 @@ import org.epsda.bookmanager.constants.Constants;
 import org.epsda.bookmanager.exception.BookManagerException;
 import org.epsda.bookmanager.mapper.PurchaseRecordMapper;
 import org.epsda.bookmanager.mapper.UserMapper;
-import org.epsda.bookmanager.pojo.BorrowRecord;
+import org.epsda.bookmanager.pojo.PurchaseRecord;
 import org.epsda.bookmanager.pojo.User;
 import org.epsda.bookmanager.pojo.request.QueryUserReq;
 import org.epsda.bookmanager.pojo.response.QueryUserResp;
@@ -130,7 +130,7 @@ public class UserServiceImpl implements UserService {
         if (user.getBorrowRecordCount() != 0) {
             throw new BookManagerException("当前用户存在借阅或逾期书籍，无法删除");
         }
-        List<BorrowRecord> purchaseRecordByUserId = purchaseRecordMapper.getPurchaseRecordByUserId(userId);
+        List<PurchaseRecord> purchaseRecordByUserId = purchaseRecordMapper.getPurchaseRecordByUserId(userId);
         if (!purchaseRecordByUserId.isEmpty()) {
             throw new BookManagerException("当前用户存在未支付的书籍，无法删除");
         }

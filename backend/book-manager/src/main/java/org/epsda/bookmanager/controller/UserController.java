@@ -42,7 +42,7 @@ public class UserController {
     }
 
     @RequestMapping("/get")
-    public ResultWrapper<User> getUserById(@RequestBody Long userId) {
+    public ResultWrapper<User> getUserById(@NotNull Long userId) {
         return ResultWrapper.normal(userService.getUserById(userId));
     }
 

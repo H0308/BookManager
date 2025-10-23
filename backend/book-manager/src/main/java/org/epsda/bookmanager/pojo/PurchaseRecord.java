@@ -22,14 +22,13 @@ import java.time.LocalDateTime;
 @TableName("purchase_record")
 public class PurchaseRecord {
     @TableId(type = IdType.AUTO)
-    private Integer id;
+    private Long id;
     @NotNull
-    private Integer userId;
+    private Long userId;
     @NotNull
-    private Integer bookId;
+    private Long bookId;
     @NotNull
     private Integer purchaseCount;
-    @NotNull
     private BigDecimal purchasePrice;
     private Integer status;
     private LocalDateTime createTime;
