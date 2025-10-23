@@ -44,7 +44,7 @@ public class User {
     private Integer purchaseRecordCount;
     @Length(max = 255, message = "图片地址最长不超过255位")
     private String avatar;
-    private Integer roleId;
+    private Long roleId;
     private Integer deleteFlag;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;

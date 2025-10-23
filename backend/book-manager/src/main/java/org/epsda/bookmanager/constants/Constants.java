@@ -45,4 +45,10 @@ public record Constants() {
 
     public static final Integer BOOK_UNPAID_FLAG = 0;
     public static final Integer BOOK_PAID_FLAG = 1;
+
+    public static final Integer USER_AVAILABLE_FLAG = 0;
+    public static final Integer USER_UNAVAILABLE_FLAG = 1;
+
+    public static final Integer ADMIN_FLAG = 0;
+    public static final Integer USER_FLAG = 1;
 }

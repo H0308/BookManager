@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.SneakyThrows;
 import org.epsda.bookmanager.pojo.response.vo.BorrowRecordResp;
 import org.epsda.bookmanager.pojo.response.vo.PurchaseRecordResp;
+import org.epsda.bookmanager.pojo.response.vo.RoleResp;
 import org.springframework.beans.BeanUtils;
 import java.lang.reflect.Constructor;
 import java.math.BigDecimal;
@@ -81,5 +82,15 @@ public class BeanUtil {
         purchaseRecordResp.setPurchasePrice(purchasePrice);
 
         return purchaseRecordResp;
+    }
+
+    public static RoleResp generateRoleResp(String username, String email, String phone, String role) {
+        RoleResp roleResp = new RoleResp();
+        roleResp.setUsername(username);
+        roleResp.setEmail(email);
+        roleResp.setPhone(phone);
+        roleResp.setRole(role);
+
+        return roleResp;
     }
 }
