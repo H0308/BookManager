@@ -50,36 +50,22 @@ public class PermissionServiceImpl implements PermissionService {
         Integer pageSize = queryRoleReq.getPageSize();
 
         Page<User> page = new Page<>(pageNum, pageSize);
+        List<RoleResp> roleResps = new ArrayList<>();
 
+        List<Long> roleIds = new ArrayList<>();
+        roleIds.add(0L);
         String role = queryRoleReq.getRole();
         if (StringUtils.hasText(role)) {
             LambdaQueryWrapper<Role> wrapper = new LambdaQueryWrapper<>();
             wrapper.like(Role::getRole, role);
             List<Role> roles = roleMapper.selectList(wrapper);
-            List<Long> roleIds = roles.stream().map(Role::getId).toList();
-            Page<User> pages = userMapper.selectPage(page,
-                    new LambdaQueryWrapper<User>().in(User::getRoleId, roleIds)
-                            .ne(User::getUsername, adminName)
-                            .eq(User::getDeleteFlag, Constants.USER_UNAVAILABLE_FLAG));
-            List<User> records = pages.getRecords();
-            List<RoleResp> roleResps = new ArrayList<>();
-            for (var record : records) {
-                String username = record.getUsername();
-                String email = record.getEmail();
-                String phone = record.getPhone();
-                Long roleId = record.getRoleId();
-                Role recordRole = roleMapper.selectById(roleId);
-                RoleResp roleResp = BeanUtil.generateRoleResp(username, email, phone, recordRole.getRole());
-                roleResps.add(roleResp);
-            }
-
-            return new QueryRoleResp(pages.getCurrent(), pages.getPages(), pages.getTotal(), roleResps);
+            roleIds = roles.stream().map(Role::getId).toList();
         }
         Page<User> pages = userMapper.selectPage(page,
-                new LambdaQueryWrapper<User>().ne(User::getUsername, adminName).
-                        eq(User::getDeleteFlag, Constants.USER_UNAVAILABLE_FLAG));
+                new LambdaQueryWrapper<User>().in(StringUtils.hasText(role), User::getRoleId, roleIds)
+                        .ne(User::getUsername, adminName)
+                        .ne(User::getDeleteFlag, Constants.USER_UNAVAILABLE_FLAG));
         List<User> records = pages.getRecords();
-        List<RoleResp> roleResps = new ArrayList<>();
         for (var record : records) {
             String username = record.getUsername();
             String email = record.getEmail();
