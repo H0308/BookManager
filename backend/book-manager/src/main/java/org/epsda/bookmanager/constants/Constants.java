@@ -49,11 +49,17 @@ public record Constants() {
     public static final Integer USER_AVAILABLE_FLAG = 0;
     public static final Integer USER_UNAVAILABLE_FLAG = 1;
 
-    public static final Integer ADMIN_FLAG = 0;
-    public static final Integer USER_FLAG = 1;
+    public static final Long ADMIN_FLAG = 0L;
+    public static final Long USER_FLAG = 1L;
 
     public static final Integer BILL_UNPAID_FLAG = 0;
     public static final Integer BILL_PAID_FLAG = 1;
     public static final String BILL_UNPAID_DESC = "待支付";
     public static final String BILL_PAID_DESC = "已支付";
+
+    public static final Integer DISPLAY_NOTICE_WORD_LENGTH = 50;
+    public static final Integer DISPLAY_LATEST_NOTICE_COUNT = 5;
+
+    public static final Integer NOTICE_PUBLISHED = 1;
+    public static final Integer NOTICE_NOT_PUBLISHED = 0;
 }

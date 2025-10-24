@@ -4,10 +4,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.SneakyThrows;
 import org.epsda.bookmanager.constants.Constants;
 import org.epsda.bookmanager.pojo.response.dto.BillRecordExcel;
-import org.epsda.bookmanager.pojo.response.vo.BillRecordResp;
-import org.epsda.bookmanager.pojo.response.vo.BorrowRecordResp;
-import org.epsda.bookmanager.pojo.response.vo.PurchaseRecordResp;
-import org.epsda.bookmanager.pojo.response.vo.RoleResp;
+import org.epsda.bookmanager.pojo.response.dto.NoticeDisplay;
+import org.epsda.bookmanager.pojo.response.vo.*;
 import org.springframework.beans.BeanUtils;
 import java.lang.reflect.Constructor;
 import java.math.BigDecimal;
@@ -141,5 +139,31 @@ public class BeanUtil {
         billRecordExcel.setUpdateTime(updateTime);
 
         return billRecordExcel;
+    }
+
+    public static NoticeResp generateNoticeResp(String username, String title, Integer type, Integer status,
+                                                LocalDateTime createTime, LocalDateTime updateTime) {
+        NoticeResp noticeResp = new NoticeResp();
+        noticeResp.setUsername(username);
+        noticeResp.setTitle(title);
+        noticeResp.setType(type);
+        noticeResp.setStatus(status);
+        noticeResp.setCreateTime(createTime);
+        noticeResp.setUpdateTime(updateTime);
+
+        return noticeResp;
+    }
+
+    public static NoticeDisplay generateNoticeDisplay(String username, String title, String content,
+                                                      Integer type, Integer status, LocalDateTime updateTime) {
+        NoticeDisplay noticeDisplay = new NoticeDisplay();
+        noticeDisplay.setUsername(username);
+        noticeDisplay.setTitle(title);
+        noticeDisplay.setType(type);
+        noticeDisplay.setStatus(status);
+        noticeDisplay.setContent(content);
+        noticeDisplay.setUpdateTime(updateTime);
+
+        return noticeDisplay;
     }
 }

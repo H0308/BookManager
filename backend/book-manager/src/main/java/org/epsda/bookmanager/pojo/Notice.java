@@ -22,14 +22,14 @@ import java.time.LocalDateTime;
 @TableName("notice")
 public class Notice {
     @TableId(type = IdType.AUTO)
-    private Integer id;
+    private Long id;
     @NotNull
     @Length(max = 20, message = "公告标题最长不超过20位")
     private String title;
     @NotNull
     private String content;
     @NotNull
-    private Integer userId;
+    private Long userId;
     private Integer type;
     private Integer status;
     private LocalDateTime createTime;

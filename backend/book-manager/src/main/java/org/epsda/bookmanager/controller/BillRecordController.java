@@ -17,6 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URLEncoder;
@@ -59,6 +60,11 @@ public class BillRecordController {
     @RequestMapping("/delete")
     public ResultWrapper<Boolean> deleteBillRecord(@NotNull Long billId) {
         return ResultWrapper.normal(billRecordService.deleteBillRecord(billId));
+    }
+
+    @RequestMapping("/batchDelete")
+    public ResultWrapper<Boolean> batchDeleteBillRecord(@RequestParam List<Long> billIds) {
+        return ResultWrapper.normal(billRecordService.batchDeleteBillRecord(billIds));
     }
 
     @RequestMapping("/excel")

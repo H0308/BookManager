@@ -37,4 +37,6 @@ public interface BillRecordService {
     Boolean deleteBorrowRecordInBillRecord(Long borrowId);
 
     Boolean deletePurchaseRecordInBillRecord(Long purchaseId);
+
+    Boolean batchDeleteBillRecord(List<Long> billIds);
 }

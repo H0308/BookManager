@@ -326,6 +326,19 @@ public class BillRecordServiceImpl implements BillRecordService {
                 new LambdaQueryWrapper<BillRecord>().eq(BillRecord::getPurchaseId, purchaseId)) == 1;
     }
 
+    @Override
+    public Boolean batchDeleteBillRecord(List<Long> billIds) {
+        var count = 0;
+        for (var billId : billIds) {
+            Boolean ret = deleteBillRecord(billId);
+            if (ret) {
+                count++;
+            }
+        }
+
+        return count == billIds.size();
+    }
+
     private BigDecimal generateBill(Long borrowId, Long purchaseId) {
         BigDecimal borrowBill = new BigDecimal(0);
         BigDecimal purchaseBill = new BigDecimal(0);
