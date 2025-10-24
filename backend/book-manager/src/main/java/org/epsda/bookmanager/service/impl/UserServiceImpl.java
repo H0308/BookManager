@@ -135,11 +135,6 @@ public class UserServiceImpl implements UserService {
             throw new BookManagerException("当前用户存在未支付的书籍，无法删除");
         }
 
-        // 检查用户状态是否为注销
-        if (USER_EXIST_STATUS.equals(user.getStatus())) {
-            throw new BookManagerException("当前用户未进行注销，无法删除");
-        }
-
         if (Constants.DELETED_FIELD_FLAG.equals(user.getDeleteFlag())) {
             throw new BookManagerException("当前用户已经删除，无法删除");
         }

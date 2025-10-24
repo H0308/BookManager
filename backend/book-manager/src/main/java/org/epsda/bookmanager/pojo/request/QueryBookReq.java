@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class QueryBookReq {
-    private Integer pageNum;
+    private Integer pageNum = 1;
     // 默认一页内容为10条
     private Integer pageSize = 10;
     private String bookName;

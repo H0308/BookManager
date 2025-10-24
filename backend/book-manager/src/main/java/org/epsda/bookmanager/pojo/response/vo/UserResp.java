@@ -18,7 +18,7 @@ public class UserResp {
     private String userIdCard;
     private String email;
     private String address;
-    private Integer status;
+    private Integer deleteFlag;
     private Integer borrowRecordCount;
     private Integer purchaseRecordCount;
 }

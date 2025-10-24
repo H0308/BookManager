@@ -2,7 +2,6 @@ package org.epsda.bookmanager.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.netty.util.internal.StringUtil;
 import org.epsda.bookmanager.constants.Constants;
 import org.epsda.bookmanager.exception.BookManagerException;
 import org.epsda.bookmanager.mapper.RoleMapper;
@@ -11,7 +10,6 @@ import org.epsda.bookmanager.pojo.Role;
 import org.epsda.bookmanager.pojo.User;
 import org.epsda.bookmanager.pojo.request.QueryRoleReq;
 import org.epsda.bookmanager.pojo.request.RoleChangeReq;
-import org.epsda.bookmanager.pojo.response.QueryBookResp;
 import org.epsda.bookmanager.pojo.response.QueryRoleResp;
 import org.epsda.bookmanager.pojo.response.vo.RoleResp;
 import org.epsda.bookmanager.service.PermissionService;

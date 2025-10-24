@@ -8,16 +8,20 @@ import lombok.NoArgsConstructor;
  * Created with IntelliJ IDEA.
  * Description:
  * User: 18483
- * Date: 2025/10/21
- * Time: 22:47
+ * Date: 2025/10/24
+ * Time: 9:29
  *
  * @Author: 憨八嘎
  */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class QueryCategoryReq {
+public class QueryBillRecordReq {
     private Integer pageNum = 1;
+    // 默认一页内容为10条
     private Integer pageSize = 10;
-    private String categoryName;
+    private String username;
+    private String email;
+    private String phone;
+    private Integer status;
 }

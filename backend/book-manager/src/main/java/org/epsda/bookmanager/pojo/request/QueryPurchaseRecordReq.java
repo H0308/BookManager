@@ -13,8 +13,8 @@ import lombok.Data;
  */
 @Data
 public class QueryPurchaseRecordReq {
-    private Integer pageNum;
-    private Integer pageSize;
+    private Integer pageNum = 1;
+    private Integer pageSize = 10;
     private String username;
     private String email;
     private String phone;

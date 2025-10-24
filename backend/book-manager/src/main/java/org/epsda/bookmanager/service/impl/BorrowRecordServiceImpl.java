@@ -13,6 +13,7 @@ import org.epsda.bookmanager.pojo.User;
 import org.epsda.bookmanager.pojo.request.QueryBorrowRecordReq;
 import org.epsda.bookmanager.pojo.response.QueryBorrowRecordResp;
 import org.epsda.bookmanager.pojo.response.vo.BorrowRecordResp;
+import org.epsda.bookmanager.service.BillRecordService;
 import org.epsda.bookmanager.service.BookService;
 import org.epsda.bookmanager.service.BorrowRecordService;
 import org.epsda.bookmanager.utils.BeanUtil;
@@ -46,6 +47,8 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
     private BookMapper bookMapper;
     @Autowired
     private BookService bookService;
+    @Autowired
+    private BillRecordService billRecordService;
 
     @Override
     public QueryBorrowRecordResp queryBorrowRecords(QueryBorrowRecordReq borrowRecordReq) {
@@ -219,16 +222,18 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
             Constants.DELETED_FIELD_FLAG.equals(borrowRecord.getDeleteFlag())) {
             throw new BookManagerException("当前借阅记录处于未归还、逾期未缴费或者已经被删除状态，无法进行删除");
         }
-
+        // 先更新账单记录
+        Boolean billUpdateRet = billRecordService.deleteBorrowRecordInBillRecord(borrowId);
         // 否则可以进行删除
         borrowRecord.setDeleteFlag(Constants.DELETED_FIELD_FLAG);
-        boolean borrowUpdateRet = updateBorrowRecordDecreaseUserBorrowCount(borrowRecord, borrowId);
+        boolean borrowUpdateRet = borrowRecordMapper.update(borrowRecord,
+                new LambdaQueryWrapper<BorrowRecord>().eq(BorrowRecord::getId, borrowId)) == 1;
         Long bookId = borrowRecord.getBookId();
         Book book = bookMapper.selectById(bookId);
         // 计算出可用量
         boolean bookUpdateRet = updateBookStatus(book);
 
-        return borrowUpdateRet && bookUpdateRet;
+        return borrowUpdateRet && bookUpdateRet && billUpdateRet;
     }
 
     @Override
@@ -257,7 +262,8 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
             borrowRecord.setStatus(Constants.RETURN_FLAG);
         }
 
-        return updateBorrowRecordDecreaseUserBorrowCount(borrowRecord, borrowId) && updateBookStatus(book);
+        return updateBorrowRecordDecreaseUserBorrowCount(borrowRecord, borrowId) && updateBookStatus(book) &&
+                billRecordService.insertOrUpdateBillRecordWithBorrowRecord(borrowRecord);
     }
 
     @Override
@@ -358,7 +364,8 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
             borrowRecord.setFine(fine);
             borrowRecord.setStatus(Constants.OVERDUE_FLAG);
             return updateBorrowRecordDecreaseUserBorrowCount(borrowRecord, borrowRecord.getId()) &&
-                    updateBookStatus(book); // 还要注意修改图书的状态
+                    updateBookStatus(book) && // 还要注意修改图书的状态
+                    billRecordService.insertOrUpdateBillRecordWithBorrowRecord(borrowRecord); // 注意添加账单记录
         } else if (Constants.RETURN_FLAG.equals(this.generateStatus(newPreReturnTime, newRealReturnTime))) {
             // 此时说明是已归还状态，仅更新状态即可
             borrowRecord.setStatus(Constants.RETURN_FLAG);

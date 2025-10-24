@@ -13,7 +13,7 @@ import lombok.Data;
  */
 @Data
 public class QueryRoleReq {
-    private Integer pageNum;
-    private Integer pageSize;
+    private Integer pageNum = 1;
+    private Integer pageSize = 10;
     private String role;
 }

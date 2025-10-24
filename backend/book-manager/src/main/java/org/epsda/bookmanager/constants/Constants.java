@@ -51,4 +51,9 @@ public record Constants() {
 
     public static final Integer ADMIN_FLAG = 0;
     public static final Integer USER_FLAG = 1;
+
+    public static final Integer BILL_UNPAID_FLAG = 0;
+    public static final Integer BILL_PAID_FLAG = 1;
+    public static final String BILL_UNPAID_DESC = "待支付";
+    public static final String BILL_PAID_DESC = "已支付";
 }

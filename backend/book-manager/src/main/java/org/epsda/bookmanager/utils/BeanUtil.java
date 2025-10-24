@@ -2,6 +2,9 @@ package org.epsda.bookmanager.utils;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.SneakyThrows;
+import org.epsda.bookmanager.constants.Constants;
+import org.epsda.bookmanager.pojo.response.dto.BillRecordExcel;
+import org.epsda.bookmanager.pojo.response.vo.BillRecordResp;
 import org.epsda.bookmanager.pojo.response.vo.BorrowRecordResp;
 import org.epsda.bookmanager.pojo.response.vo.PurchaseRecordResp;
 import org.epsda.bookmanager.pojo.response.vo.RoleResp;
@@ -92,5 +95,51 @@ public class BeanUtil {
         roleResp.setRole(role);
 
         return roleResp;
+    }
+
+    public static BillRecordResp generateBillRecordResp(String username, String email, String phone, Integer status, BigDecimal bills) {
+        BillRecordResp billRecordResp = new BillRecordResp();
+        billRecordResp.setUsername(username);
+        billRecordResp.setEmail(email);
+        billRecordResp.setPhone(phone);
+        billRecordResp.setStatus(status);
+        billRecordResp.setBills(bills);
+
+        return billRecordResp;
+    }
+
+    public static BillRecordExcel generateBilRecordExcel(Long id, Long userId, String username, String phone, String email,
+                                                         Long borrowId, String borrowBookName, String borrowBookIsbn,
+                                                         Long purchaseId, String purchaseBookName, String purchaseBookIsbn,
+                                                         BigDecimal fine, BigDecimal purchasePrice, BigDecimal totalBill,
+                                                         Integer status, LocalDateTime createTime, LocalDateTime updateTime) {
+        BillRecordExcel billRecordExcel = new BillRecordExcel();
+        billRecordExcel.setId(id);
+        billRecordExcel.setUserId(userId);
+        billRecordExcel.setUsername(username);
+        billRecordExcel.setEmail(email);
+        billRecordExcel.setPhone(phone);
+        billRecordExcel.setBorrowId(borrowId);
+        if (borrowBookName != null && borrowBookIsbn != null) {
+            billRecordExcel.setBorrowBookName(borrowBookName);
+            billRecordExcel.setBorrowBookIsbn(borrowBookIsbn);
+            billRecordExcel.setFine(fine);
+        }
+        billRecordExcel.setPurchaseId(purchaseId);
+        if (purchaseBookName != null && purchaseBookIsbn != null) {
+            billRecordExcel.setPurchaseBookName(purchaseBookName);
+            billRecordExcel.setPurchaseBookIsbn(purchaseBookIsbn);
+            billRecordExcel.setPurchasePrice(purchasePrice);
+        }
+        billRecordExcel.setTotalBill(totalBill);
+        if (Constants.BILL_UNPAID_FLAG.equals(status)) {
+            billRecordExcel.setStatus(Constants.BILL_UNPAID_DESC);
+        } else if (Constants.BILL_PAID_FLAG.equals(status)) {
+            billRecordExcel.setStatus(Constants.BILL_PAID_DESC);
+        }
+        billRecordExcel.setCreateTime(createTime);
+        billRecordExcel.setUpdateTime(updateTime);
+
+        return billRecordExcel;
     }
 }

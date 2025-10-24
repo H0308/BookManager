@@ -13,6 +13,7 @@ import org.epsda.bookmanager.pojo.User;
 import org.epsda.bookmanager.pojo.request.QueryPurchaseRecordReq;
 import org.epsda.bookmanager.pojo.response.QueryPurchaseRecordResp;
 import org.epsda.bookmanager.pojo.response.vo.PurchaseRecordResp;
+import org.epsda.bookmanager.service.BillRecordService;
 import org.epsda.bookmanager.service.BookService;
 import org.epsda.bookmanager.service.PurchaseRecordService;
 import org.epsda.bookmanager.utils.BeanUtil;
@@ -44,6 +45,8 @@ public class PurchaseRecordServiceImpl implements PurchaseRecordService {
     private PurchaseRecordMapper purchaseRecordMapper;
     @Autowired
     private BookService bookService;
+    @Autowired
+    private BillRecordService billRecordService;
 
     @Override
     public QueryPurchaseRecordResp queryPurchaseRecords(QueryPurchaseRecordReq queryPurchaseRecordReq) {
@@ -153,7 +156,7 @@ public class PurchaseRecordServiceImpl implements PurchaseRecordService {
             if (purchaseRecord.getPurchaseCount() > bookService.getAvailableCount(book)) {
                 throw new BookManagerException("购买数量大于现有量，无法购买");
             } else {
-                existed.setPurchasePrice(book.getPrice().multiply(new BigDecimal(purchaseRecord.getPurchaseCount())));
+                existed.setPurchasePrice(book.getPrice().multiply(new BigDecimal(purchaseRecord.getPurchaseCount())).add(existed.getPurchasePrice()));
                 existed.setPurchaseCount(existed.getPurchaseCount() + purchaseRecord.getPurchaseCount());
                 user.setPurchaseRecordCount(user.getPurchaseRecordCount() + purchaseRecord.getPurchaseCount());
                 return purchaseRecordMapper.update(existed,
@@ -169,8 +172,11 @@ public class PurchaseRecordServiceImpl implements PurchaseRecordService {
         // 增加用户的购买量和购买金额
         user.setPurchaseRecordCount(user.getPurchaseRecordCount() + purchaseRecord.getPurchaseCount());
         boolean updateRet = userMapper.update(user, new LambdaQueryWrapper<User>().eq(User::getId, user.getId())) == 1;
-
-        return insertRet && updateRet && updateBookStatus(book); // 需要检查是否需要修改书籍状态
+        // 此处需要显式设置购买状态，数据库默认设置为0，但是此时并没有同步给purchaseRecord变量
+        // 导致下面insertOrUpdateBillRecordWithPurchaseRecord插入的对象status为空
+        purchaseRecord.setStatus(0);
+        return insertRet && updateRet && updateBookStatus(book) && // 需要检查是否需要修改书籍状态
+                billRecordService.insertOrUpdateBillRecordWithPurchaseRecord(purchaseRecord);
     }
 
     @Override
@@ -245,7 +251,7 @@ public class PurchaseRecordServiceImpl implements PurchaseRecordService {
         user.setPurchaseRecordCount(user.getPurchaseRecordCount() - purchaseRecord.getPurchaseCount());
         return purchaseRecordMapper.delete(new LambdaQueryWrapper<PurchaseRecord>().eq(PurchaseRecord::getId, purchaseId)) == 1 &&
                 userMapper.update(user, new LambdaQueryWrapper<User>().eq(User::getId, user.getId())) == 1 &&
-                updateBookStatus(book);
+                updateBookStatus(book) && billRecordService.deletePurchaseRecordInBillRecord(purchaseId);
     }
 
     private boolean updateBookStatus(Book book) {

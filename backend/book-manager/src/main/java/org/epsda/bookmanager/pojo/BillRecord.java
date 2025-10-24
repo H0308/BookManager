@@ -21,13 +21,14 @@ import java.time.LocalDateTime;
 @TableName("bill_record")
 public class BillRecord {
     @TableId(type = IdType.AUTO)
-    private Integer id;
+    private Long id;
     @NotNull
-    private Integer userId;
+    private Long userId;
     @NotNull
-    private Integer borrowId;
+    private Long borrowId;
     @NotNull
-    private Integer purchaseId;
+    private Long purchaseId;
+    private Integer status;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
 }

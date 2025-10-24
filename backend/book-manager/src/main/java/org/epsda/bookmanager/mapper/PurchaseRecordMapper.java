@@ -19,10 +19,14 @@ import java.util.List;
  */
 @Mapper
 public interface PurchaseRecordMapper extends BaseMapper<PurchaseRecord> {
-    // 根据book_id进行查询出未支付的图书
-    @Select("select * from purchase_record where book_id = #{bookId} and status = 0")
+    // 根据user_id进行查询出现在购买账单中的图书，不论是已支付还是待支付，都需要考虑
+    // 因为预定和已支付都属于拥有指定图书
+
+    // 根据book_id进行查询购买记录
+    @Select("select * from purchase_record where book_id = #{bookId}")
     List<PurchaseRecord> getPurchaseRecordByBookId(Long bookId);
-    // 根据user_id进行查询出未支付的图书
-    @Select("select * from purchase_record where user_id = #{userId} and status = 0")
+
+    // 根据book_id进行查询购买记录
+    @Select("select * from purchase_record where user_id = #{userId}")
     List<PurchaseRecord> getPurchaseRecordByUserId(Long userId);
 }

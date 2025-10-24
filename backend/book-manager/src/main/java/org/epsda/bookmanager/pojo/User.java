@@ -39,7 +39,6 @@ public class User {
     @NotNull
     @Length(max = 30, message = "地址最长不超过30位")
     private String address;
-    private Integer status;
     private Integer borrowRecordCount;
     private Integer purchaseRecordCount;
     @Length(max = 255, message = "图片地址最长不超过255位")
