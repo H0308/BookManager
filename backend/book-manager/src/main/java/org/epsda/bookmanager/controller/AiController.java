@@ -1,7 +1,5 @@
 package org.epsda.bookmanager.controller;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import org.epsda.bookmanager.pojo.request.AiReq;
 import org.epsda.bookmanager.service.UserService;
 import org.springframework.ai.chat.client.ChatClient;
