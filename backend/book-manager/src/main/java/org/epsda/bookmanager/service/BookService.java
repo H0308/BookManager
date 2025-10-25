@@ -1,6 +1,5 @@
 package org.epsda.bookmanager.service;
 
-import jakarta.validation.constraints.NotNull;
 import org.epsda.bookmanager.pojo.Book;
 import org.epsda.bookmanager.pojo.request.QueryBookReq;
 import org.epsda.bookmanager.pojo.response.QueryBookResp;

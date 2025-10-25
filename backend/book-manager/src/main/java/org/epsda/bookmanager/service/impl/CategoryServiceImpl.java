@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.epsda.bookmanager.constants.Constants;
 import org.epsda.bookmanager.exception.BookManagerException;
 import org.epsda.bookmanager.mapper.CategoryMapper;
-import org.epsda.bookmanager.pojo.Book;
 import org.epsda.bookmanager.pojo.Category;
 import org.epsda.bookmanager.pojo.request.QueryCategoryReq;
 import org.epsda.bookmanager.pojo.response.QueryCategoryResp;

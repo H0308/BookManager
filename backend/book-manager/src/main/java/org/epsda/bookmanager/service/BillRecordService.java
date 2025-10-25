@@ -1,6 +1,5 @@
 package org.epsda.bookmanager.service;
 
-import jakarta.validation.constraints.NotNull;
 import org.epsda.bookmanager.pojo.BorrowRecord;
 import org.epsda.bookmanager.pojo.PurchaseRecord;
 import org.epsda.bookmanager.pojo.request.QueryBillRecordReq;

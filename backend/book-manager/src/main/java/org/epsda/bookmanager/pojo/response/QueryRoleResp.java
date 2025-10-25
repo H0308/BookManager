@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.epsda.bookmanager.pojo.response.vo.RoleResp;
-import org.epsda.bookmanager.pojo.response.vo.UserResp;
 
 import java.util.List;
 

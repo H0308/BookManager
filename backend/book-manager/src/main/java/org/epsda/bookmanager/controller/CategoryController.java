@@ -2,8 +2,6 @@ package org.epsda.bookmanager.controller;
 
 import jakarta.validation.constraints.NotNull;
 import org.epsda.bookmanager.common.ResultWrapper;
-import org.epsda.bookmanager.mapper.CategoryMapper;
-import org.epsda.bookmanager.pojo.Book;
 import org.epsda.bookmanager.pojo.Category;
 import org.epsda.bookmanager.pojo.request.QueryCategoryReq;
 import org.epsda.bookmanager.pojo.response.QueryCategoryResp;

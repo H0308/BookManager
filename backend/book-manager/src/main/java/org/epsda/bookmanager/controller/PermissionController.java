@@ -1,6 +1,5 @@
 package org.epsda.bookmanager.controller;
 
-import jakarta.validation.constraints.NotNull;
 import org.epsda.bookmanager.common.ResultWrapper;
 import org.epsda.bookmanager.pojo.request.QueryRoleReq;
 import org.epsda.bookmanager.pojo.request.RoleChangeReq;
@@ -11,8 +10,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.management.relation.RoleStatus;
 
 /**
  * Created with IntelliJ IDEA.

@@ -3,7 +3,6 @@ package org.epsda.bookmanager.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
-import org.epsda.bookmanager.pojo.BorrowRecord;
 import org.epsda.bookmanager.pojo.PurchaseRecord;
 
 import java.util.List;

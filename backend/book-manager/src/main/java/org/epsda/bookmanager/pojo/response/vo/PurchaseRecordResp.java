@@ -1,6 +1,5 @@
 package org.epsda.bookmanager.pojo.response.vo;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.math.BigDecimal;

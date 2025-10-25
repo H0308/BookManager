@@ -2,7 +2,6 @@ package org.epsda.bookmanager.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.apache.tomcat.util.bcel.Const;
 import org.epsda.bookmanager.constants.Constants;
 import org.epsda.bookmanager.exception.BookManagerException;
 import org.epsda.bookmanager.mapper.*;
@@ -15,7 +14,6 @@ import org.epsda.bookmanager.pojo.response.vo.BillRecordResp;
 import org.epsda.bookmanager.service.BillRecordService;
 import org.epsda.bookmanager.utils.BeanUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 

@@ -5,7 +5,6 @@ import org.epsda.bookmanager.pojo.Notice;
 import org.epsda.bookmanager.pojo.request.QueryNoticeReq;
 import org.epsda.bookmanager.pojo.response.NoticeDisplayResp;
 import org.epsda.bookmanager.pojo.response.QueryNoticeResp;
-import org.epsda.bookmanager.pojo.response.dto.NoticeDisplay;
 
 import java.util.List;
 

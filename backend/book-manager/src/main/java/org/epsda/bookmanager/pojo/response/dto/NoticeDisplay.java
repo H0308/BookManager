@@ -2,9 +2,7 @@ package org.epsda.bookmanager.pojo.response.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.epsda.bookmanager.constants.Constants;
 
 import java.time.LocalDateTime;
 
