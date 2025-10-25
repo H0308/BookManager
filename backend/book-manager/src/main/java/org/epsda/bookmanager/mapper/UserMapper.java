@@ -29,4 +29,10 @@ public interface UserMapper extends BaseMapper<User> {
     List<User> selectByPhone(String phone);
     @Select("select * from user where email = #{email}")
     User selectByPreciseEmail(String email);
+    @Select("select * from user where username = #{username}")
+    User selectByPreciseUsername(String username);
+    @Select("select * from user where phone = #{phone}")
+    User selectByPrecisePhone(String phone);
+    @Select("select * from user where user_id_card = #{userIdCard}")
+    User selectByPreciseUserIdCard(String userIdCard);
 }

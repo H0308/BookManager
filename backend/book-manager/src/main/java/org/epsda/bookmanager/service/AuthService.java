@@ -1,7 +1,8 @@
 package org.epsda.bookmanager.service;
 
-import org.epsda.bookmanager.pojo.request.LoginRequest;
-import org.epsda.bookmanager.pojo.response.LoginResponse;
+import org.epsda.bookmanager.pojo.request.LoginReq;
+import org.epsda.bookmanager.pojo.request.RegisterReq;
+import org.epsda.bookmanager.pojo.response.LoginResp;
 
 /**
  * Created with IntelliJ IDEA.
@@ -13,5 +14,7 @@ import org.epsda.bookmanager.pojo.response.LoginResponse;
  * @Author: 憨八嘎
  */
 public interface AuthService {
-    LoginResponse login(LoginRequest loginRequest);
+    LoginResp login(LoginReq loginReq);
+
+    Boolean register(RegisterReq registerReq);
 }

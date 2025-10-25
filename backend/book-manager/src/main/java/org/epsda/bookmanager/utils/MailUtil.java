@@ -4,6 +4,7 @@ import jakarta.mail.internet.MimeMessage;
 import org.springframework.boot.autoconfigure.mail.MailProperties;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.stereotype.Component;
 
 /**
  * Created with IntelliJ IDEA.
@@ -14,10 +15,11 @@ import org.springframework.mail.javamail.MimeMessageHelper;
  *
  * @Author: 憨八嘎
  */
+@Component
 public class MailUtil {
 
-    private JavaMailSender javaMailSender;
-    private MailProperties mailProperties;
+    private final JavaMailSender javaMailSender;
+    private final MailProperties mailProperties;
 
     public MailUtil(JavaMailSender javaMailSender, MailProperties mailProperties) {
         this.javaMailSender = javaMailSender;

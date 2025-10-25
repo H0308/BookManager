@@ -1,11 +1,17 @@
 package org.epsda.bookmanager.service.impl;
 
+import org.epsda.bookmanager.constants.Constants;
+import org.epsda.bookmanager.exception.BookManagerException;
 import org.epsda.bookmanager.mapper.UserMapper;
 import org.epsda.bookmanager.pojo.User;
-import org.epsda.bookmanager.pojo.request.LoginRequest;
-import org.epsda.bookmanager.pojo.response.LoginResponse;
+import org.epsda.bookmanager.pojo.request.LoginReq;
+import org.epsda.bookmanager.pojo.request.RegisterReq;
+import org.epsda.bookmanager.pojo.response.LoginResp;
+import org.epsda.bookmanager.pojo.response.dto.RegisterMail;
 import org.epsda.bookmanager.service.AuthService;
+import org.epsda.bookmanager.utils.JsonUtil;
 import org.epsda.bookmanager.utils.JwtUtil;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -27,11 +33,13 @@ public class AuthServiceImpl implements AuthService {
     private AuthenticationManager authenticationManager;
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
     @Override
-    public LoginResponse login(LoginRequest loginRequest) {
-        String email = loginRequest.getEmail();
-        String password = loginRequest.getPassword();
+    public LoginResp login(LoginReq loginReq) {
+        String email = loginReq.getEmail();
+        String password = loginReq.getPassword();
         // 进行用户存在性校验
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
 
@@ -40,6 +48,35 @@ public class AuthServiceImpl implements AuthService {
         String token = JwtUtil.generateToken(user.getEmail(), user.getUsername());
 
         // 返回登录响应
-        return new LoginResponse(user.getUsername(), user.getRoleId(), token);
+        return new LoginResp(user.getUsername(), user.getRoleId(), token);
+    }
+
+    @Override
+    public Boolean register(RegisterReq registerReq) {
+        // 判断注册的用户是否存在
+        String username = registerReq.getUsername();
+        String userIdCard = registerReq.getUserIdCard();
+        String email = registerReq.getEmail();
+        String phone = registerReq.getPhone();
+
+        if (userMapper.selectByPreciseUsername(username) != null ||
+            userMapper.selectByPrecisePhone(phone) != null ||
+            userMapper.selectByPreciseUserIdCard(userIdCard) != null ||
+            userMapper.selectByPreciseEmail(email) != null) {
+            throw new BookManagerException("当前用户已存在无法继续注册");
+        }
+
+        User user = new User();
+        user.setUsername(username);
+        user.setUserIdCard(userIdCard);
+        user.setEmail(email);
+        user.setPhone(phone);
+        user.setPassword(registerReq.getPassword());
+        user.setAddress(registerReq.getAddress());
+
+        String userMail = JsonUtil.toJson(new RegisterMail(user.getUsername(), user.getEmail()));
+        rabbitTemplate.convertAndSend(Constants.RABBITMQ_USER_EXCHANGE, "", userMail);
+
+        return userMapper.insert(user) == 1;
     }
 }

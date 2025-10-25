@@ -11,11 +11,16 @@ import org.epsda.bookmanager.pojo.PurchaseRecord;
 import org.epsda.bookmanager.pojo.User;
 import org.epsda.bookmanager.pojo.request.QueryUserReq;
 import org.epsda.bookmanager.pojo.response.QueryUserResp;
+import org.epsda.bookmanager.pojo.response.dto.PasswordMail;
+import org.epsda.bookmanager.pojo.response.dto.RegisterMail;
 import org.epsda.bookmanager.pojo.response.vo.UserResp;
 import org.epsda.bookmanager.service.UserService;
 import org.epsda.bookmanager.utils.BeanUtil;
+import org.epsda.bookmanager.utils.JsonUtil;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -41,6 +46,8 @@ public class UserServiceImpl implements UserService {
     private UserMapper userMapper;
     @Autowired
     private PurchaseRecordMapper purchaseRecordMapper;
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
     @Override
     public QueryUserResp queryUsers(QueryUserReq queryUserReq) {
@@ -113,6 +120,8 @@ public class UserServiceImpl implements UserService {
         // 如果发生加密，此处需要修改匹配方式
         if (!oldUser.getPassword().equals(user.getPassword())) {
             // 需要处理密码邮件发送
+            String passwordMail = JsonUtil.toJson(new PasswordMail(user.getUsername(), user.getEmail(), user.getPassword()));
+            rabbitTemplate.convertAndSend(Constants.RABBITMQ_USER_EXCHANGE, "", passwordMail);
             // 需要删除该登录状态，让用户重新登录
             log.info("用户修改了密码，新密码为：{}", user.getPassword());
         }

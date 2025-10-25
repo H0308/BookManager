@@ -1,4 +1,4 @@
-package org.epsda.bookmanager.pojo.response;
+package org.epsda.bookmanager.pojo.response.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,15 +9,14 @@ import lombok.NoArgsConstructor;
  * Description:
  * User: 18483
  * Date: 2025/10/25
- * Time: 15:20
+ * Time: 17:00
  *
  * @Author: 憨八嘎
  */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class LoginResponse {
+public class RegisterMail {
     private String username;
-    private Long roleId;
-    private String token;
+    private String email;
 }
