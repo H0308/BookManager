@@ -47,3 +47,5 @@ avatar:
     path: E:\BookManager\backend\images
 admin:
   admin-name: book_admin_001
+jwt:
+  secret-key-signature: book_manager_spring_boot

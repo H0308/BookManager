@@ -27,4 +27,6 @@ public interface UserMapper extends BaseMapper<User> {
     // 根据联系电话获取到用户信息
     @Select("select * from user where email like concat('%', #{phone}, '%')")
     List<User> selectByPhone(String phone);
+    @Select("select * from user where email = #{email}")
+    User selectByPreciseEmail(String email);
 }

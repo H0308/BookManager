@@ -10,7 +10,11 @@ package org.epsda.bookmanager.constants;
  * @Author: 憨八嘎
  */
 public record Constants() {
-    public static final String TOKEN_HEADER = "user_login_header_token";
+    public static final String TOKEN_HEADER = "Authorization";
+    public static final String TOKEN_START_FLAG = "Bearer ";
+
+    public static final String SECURITY_ROLE_PREFIX = "ROLE_";
+
     public static final String USER_INFO_REDIS_PREFIX = "user";
     public static final String BLOG_INFO_REDIS_PREFIX = "blog";
     public static final String REDIS_NAMESPACE_SEP = ":";

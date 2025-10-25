@@ -2,8 +2,10 @@ package org.epsda.bookmanager.utils;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.io.Encoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
@@ -22,16 +24,16 @@ import java.util.Map;
 public class JwtUtil {
 
     // 生成密钥
-    private static final String SECRET_KEY = Encoders.BASE64.encode(Jwts.SIG.HS256.key().build().getEncoded());
+    private final static String secretKeySignature = "uh7Ib5KBKRwQCLal4ziR1UmsVJ07FirkpEJl10JFu+c=";
 
     // 过期时间
     private static final long EXPIRATION_TIME = 24 * 60 * 60 * 1000;
 
-    private SecretKey getSigningKey() {
-        return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
+    private static SecretKey getSigningKey() {
+        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKeySignature));
     }
 
-    public String generateToken(String email, String username) {
+    public static String generateToken(String email, String username) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("email", email);
         claims.put("username", username);
@@ -45,19 +47,19 @@ public class JwtUtil {
                 .compact();
     }
 
-    public String extractEmail(String token) {
+    public static String extractEmail(String token) {
         return (String) extractClaims(token).get("email");
     }
 
-    public String extractUsername(String token) {
+    public static String extractUsername(String token) {
         return (String) extractClaims(token).get("username");
     }
 
-    public Date extractExpiration(String token) {
+    public static Date extractExpiration(String token) {
         return extractClaims(token).getExpiration();
     }
 
-    private Claims extractClaims(String token) {
+    private static Claims extractClaims(String token) {
         return Jwts.parser()
                 .verifyWith(getSigningKey())
                 .build()
@@ -65,11 +67,11 @@ public class JwtUtil {
                 .getPayload();
     }
 
-    public boolean isTokenExpired(String token) {
+    public static boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
 
-    public boolean validateToken(String token, String username) {
+    public static boolean validateToken(String token, String username) {
         try {
             final String tokenUsername = extractUsername(token);
             return (tokenUsername.equals(username) && !isTokenExpired(token));
