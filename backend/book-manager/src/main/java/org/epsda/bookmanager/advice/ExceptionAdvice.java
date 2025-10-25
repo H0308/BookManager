@@ -29,9 +29,15 @@ public class ExceptionAdvice {
     @ExceptionHandler(Exception.class)
     public ResultWrapper allExcetionHandler(Exception e) {
         log.info("出现异常：{}", e.getMessage());
-        MethodArgumentNotValidException methodValidationException = (MethodArgumentNotValidException) e;
-        // 不做非空校验
-        String errMsg = methodValidationException.getBindingResult().getFieldError().getDefaultMessage();
+        MethodArgumentNotValidException methodValidationException = null;
+        if (e instanceof MethodArgumentNotValidException) {
+            methodValidationException = (MethodArgumentNotValidException) e;
+        }
+        String errMsg = e.getMessage();
+        if (methodValidationException != null) {
+            errMsg = methodValidationException.getBindingResult().getFieldError().getDefaultMessage();
+        }
+
         return ResultWrapper.fail(Constants.SERVER_ERROR, Constants.SERVER_ERROR_MESSAGE + "：" + errMsg);
     }
 
