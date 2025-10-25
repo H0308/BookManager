@@ -36,7 +36,7 @@ import java.util.List;
 @Service
 public class NoticeServiceImpl implements NoticeService {
 
-    @Value("${admin.adminName}")
+    @Value("${admin.admin-name}")
     private String adminName;
 
     @Autowired

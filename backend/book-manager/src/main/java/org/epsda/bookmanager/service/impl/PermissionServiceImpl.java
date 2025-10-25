@@ -34,7 +34,7 @@ import java.util.List;
 @Service
 public class PermissionServiceImpl implements PermissionService {
 
-    @Value("${admin.adminName}")
+    @Value("${admin.admin-name}")
     private String adminName;
 
     @Autowired

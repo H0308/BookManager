@@ -46,4 +46,4 @@ avatar:
   upload:
     path: E:\BookManager\backend\images
 admin:
-  adminName: book_admin_001
+  admin-name: book_admin_001

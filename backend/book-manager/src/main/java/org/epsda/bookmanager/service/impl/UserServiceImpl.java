@@ -34,11 +34,8 @@ import java.util.List;
 @Slf4j
 public class UserServiceImpl implements UserService {
 
-    @Value("${admin.adminName}")
+    @Value("${admin.admin-name}")
     private String adminName;
-
-    private static final Integer USER_EXIST_STATUS = 0;
-    private static final Integer USER_RESIGN_STATUS = 1;
 
     @Autowired
     private UserMapper userMapper;
