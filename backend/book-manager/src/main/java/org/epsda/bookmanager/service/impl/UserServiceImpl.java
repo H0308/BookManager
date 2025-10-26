@@ -12,7 +12,6 @@ import org.epsda.bookmanager.pojo.User;
 import org.epsda.bookmanager.pojo.request.QueryUserReq;
 import org.epsda.bookmanager.pojo.response.QueryUserResp;
 import org.epsda.bookmanager.pojo.response.dto.PasswordMail;
-import org.epsda.bookmanager.pojo.response.dto.RegisterMail;
 import org.epsda.bookmanager.pojo.response.vo.UserResp;
 import org.epsda.bookmanager.service.UserService;
 import org.epsda.bookmanager.utils.BeanUtil;
@@ -21,7 +20,6 @@ import org.epsda.bookmanager.utils.SecurityUtil;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 

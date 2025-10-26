@@ -10,14 +10,11 @@ import org.epsda.bookmanager.pojo.request.QueryBillRecordReq;
 import org.epsda.bookmanager.pojo.response.DetailedBillRecord;
 import org.epsda.bookmanager.pojo.response.QueryBillRecordResp;
 import org.epsda.bookmanager.pojo.response.dto.BillRecordExcel;
-import org.epsda.bookmanager.pojo.response.dto.CustomUserDetails;
 import org.epsda.bookmanager.pojo.response.vo.BillRecordResp;
 import org.epsda.bookmanager.service.BillRecordService;
 import org.epsda.bookmanager.utils.BeanUtil;
 import org.epsda.bookmanager.utils.SecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 

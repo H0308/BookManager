@@ -1,7 +1,6 @@
 package org.epsda.bookmanager.controller;
 
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
 import org.epsda.bookmanager.common.ResultWrapper;
 import org.epsda.bookmanager.pojo.response.AdminIndexDataResp;
 import org.epsda.bookmanager.pojo.response.UserIndexDataResp;

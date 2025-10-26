@@ -9,7 +9,6 @@ import org.epsda.bookmanager.exception.BookManagerException;
 import org.epsda.bookmanager.pojo.User;
 import org.epsda.bookmanager.pojo.response.dto.CustomUserDetails;
 import org.epsda.bookmanager.service.UserService;
-import org.epsda.bookmanager.utils.SecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -21,7 +20,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;

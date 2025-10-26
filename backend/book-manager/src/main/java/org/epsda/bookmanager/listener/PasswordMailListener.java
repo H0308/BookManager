@@ -5,7 +5,6 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.epsda.bookmanager.constants.Constants;
 import org.epsda.bookmanager.pojo.response.dto.PasswordMail;
-import org.epsda.bookmanager.pojo.response.dto.RegisterMail;
 import org.epsda.bookmanager.utils.JsonUtil;
 import org.epsda.bookmanager.utils.MailUtil;
 import org.springframework.amqp.core.Message;

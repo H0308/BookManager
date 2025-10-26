@@ -6,7 +6,6 @@ import org.epsda.bookmanager.constants.Constants;
 import org.epsda.bookmanager.exception.BookManagerException;
 import org.epsda.bookmanager.mapper.NoticeMapper;
 import org.epsda.bookmanager.mapper.UserMapper;
-import org.epsda.bookmanager.pojo.Book;
 import org.epsda.bookmanager.pojo.Notice;
 import org.epsda.bookmanager.pojo.User;
 import org.epsda.bookmanager.pojo.request.QueryNoticeReq;
