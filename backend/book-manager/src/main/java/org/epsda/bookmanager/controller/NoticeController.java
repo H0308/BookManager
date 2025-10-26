@@ -5,6 +5,7 @@ import org.epsda.bookmanager.common.ResultWrapper;
 import org.epsda.bookmanager.pojo.Notice;
 import org.epsda.bookmanager.pojo.request.QueryNoticeReq;
 import org.epsda.bookmanager.pojo.response.NoticeDisplayResp;
+import org.epsda.bookmanager.pojo.response.NoticeHistoryResp;
 import org.epsda.bookmanager.pojo.response.QueryNoticeResp;
 import org.epsda.bookmanager.service.NoticeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +47,7 @@ public class NoticeController {
     }
 
     @RequestMapping("/history")
-    public ResultWrapper<NoticeDisplayResp> queryHistoryNotice(@Validated @RequestBody QueryNoticeReq queryNoticeReq) {
+    public ResultWrapper<NoticeHistoryResp> queryHistoryNotice(@Validated @RequestBody QueryNoticeReq queryNoticeReq) {
         return ResultWrapper.normal(noticeService.queryHistoryNotice(queryNoticeReq));
     }
 

@@ -19,6 +19,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BillRecordResp {
+    private Long id;
     private String username;
     private String email;
     private String phone;

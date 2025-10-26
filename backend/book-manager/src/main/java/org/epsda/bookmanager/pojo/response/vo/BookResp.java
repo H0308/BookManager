@@ -15,6 +15,7 @@ import java.math.BigDecimal;
  */
 @Data
 public class BookResp {
+    private Long id;
     private String bookName;
     private String isbn;
     private String author;

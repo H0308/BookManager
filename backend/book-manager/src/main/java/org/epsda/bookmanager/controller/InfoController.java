@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -61,7 +62,7 @@ public class InfoController {
 
     // 编辑用户个人信息
     @RequestMapping("/edit")
-    public ResultWrapper<Boolean> editUserInfo(@NotNull User user) {
+    public ResultWrapper<Boolean> editUserInfo(@RequestBody User user) {
         // 当前接口不论是管理员还是普通用户都不允许越权
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         CustomUserDetails principal = (CustomUserDetails) authentication.getPrincipal();

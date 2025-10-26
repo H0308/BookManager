@@ -75,7 +75,7 @@ public class PermissionServiceImpl implements PermissionService {
             String phone = record.getPhone();
             Long roleId = record.getRoleId();
             Role recordRole = roleMapper.selectById(roleId);
-            RoleResp roleResp = BeanUtil.generateRoleResp(username, email, phone, recordRole.getRole());
+            RoleResp roleResp = BeanUtil.generateRoleResp(record.getId(), username, email, phone, recordRole.getRole());
             roleResps.add(roleResp);
         }
 

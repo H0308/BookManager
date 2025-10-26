@@ -117,7 +117,7 @@ public class BillRecordServiceImpl implements BillRecordService {
             Long borrowId = record.getBorrowId();
             Long purchaseId = record.getPurchaseId();
             BigDecimal bills = generateBill(borrowId, purchaseId);
-            BillRecordResp billRecordResp = BeanUtil.generateBillRecordResp(recordUsername, recordEmail, recordPhone, recordStatus, bills);
+            BillRecordResp billRecordResp = BeanUtil.generateBillRecordResp(record.getId(), recordUsername, recordEmail, recordPhone, recordStatus, bills);
             billRecordResps.add(billRecordResp);
         }
 

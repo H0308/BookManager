@@ -42,7 +42,7 @@ public class BeanUtil {
         return returnResp;
     }
 
-    public static BorrowRecordResp generateBorrowRecordResp(String username,
+    public static BorrowRecordResp generateBorrowRecordResp(Long id, String username,
                                                             String phone,
                                                             String email,
                                                             String BookName,
@@ -53,6 +53,7 @@ public class BeanUtil {
                                                             Integer status,
                                                             BigDecimal fine) {
         BorrowRecordResp borrowRecordResp = new BorrowRecordResp();
+        borrowRecordResp.setId(id);
         borrowRecordResp.setUsername(username);
         borrowRecordResp.setEmail(email);
         borrowRecordResp.setPhone(phone);
@@ -66,7 +67,7 @@ public class BeanUtil {
         return borrowRecordResp;
     }
 
-    public static PurchaseRecordResp generatePurchaseRecordResp(String username,
+    public static PurchaseRecordResp generatePurchaseRecordResp(Long id, String username,
                                                                 String phone,
                                                                 String email,
                                                                 String BookName,
@@ -75,6 +76,7 @@ public class BeanUtil {
                                                                 BigDecimal purchasePrice) {
         PurchaseRecordResp purchaseRecordResp = new PurchaseRecordResp();
         purchaseRecordResp.setUsername(username);
+        purchaseRecordResp.setId(id);
         purchaseRecordResp.setEmail(email);
         purchaseRecordResp.setPhone(phone);
         purchaseRecordResp.setBookName(BookName);
@@ -85,8 +87,9 @@ public class BeanUtil {
         return purchaseRecordResp;
     }
 
-    public static RoleResp generateRoleResp(String username, String email, String phone, String role) {
+    public static RoleResp generateRoleResp(Long id, String username, String email, String phone, String role) {
         RoleResp roleResp = new RoleResp();
+        roleResp.setId(id);
         roleResp.setUsername(username);
         roleResp.setEmail(email);
         roleResp.setPhone(phone);
@@ -95,8 +98,9 @@ public class BeanUtil {
         return roleResp;
     }
 
-    public static BillRecordResp generateBillRecordResp(String username, String email, String phone, Integer status, BigDecimal bills) {
+    public static BillRecordResp generateBillRecordResp(Long id, String username, String email, String phone, Integer status, BigDecimal bills) {
         BillRecordResp billRecordResp = new BillRecordResp();
+        billRecordResp.setId(id);
         billRecordResp.setUsername(username);
         billRecordResp.setEmail(email);
         billRecordResp.setPhone(phone);
@@ -141,9 +145,10 @@ public class BeanUtil {
         return billRecordExcel;
     }
 
-    public static NoticeResp generateNoticeResp(String username, String title, Integer type, Integer status,
+    public static NoticeResp generateNoticeResp(Long id, String username, String title, Integer type, Integer status,
                                                 LocalDateTime createTime, LocalDateTime updateTime) {
         NoticeResp noticeResp = new NoticeResp();
+        noticeResp.setId(id);
         noticeResp.setUsername(username);
         noticeResp.setTitle(title);
         noticeResp.setType(type);

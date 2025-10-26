@@ -10,6 +10,7 @@ import org.epsda.bookmanager.pojo.Notice;
 import org.epsda.bookmanager.pojo.User;
 import org.epsda.bookmanager.pojo.request.QueryNoticeReq;
 import org.epsda.bookmanager.pojo.response.NoticeDisplayResp;
+import org.epsda.bookmanager.pojo.response.NoticeHistoryResp;
 import org.epsda.bookmanager.pojo.response.QueryNoticeResp;
 import org.epsda.bookmanager.pojo.response.dto.NoticeDisplay;
 import org.epsda.bookmanager.pojo.response.vo.NoticeResp;
@@ -90,7 +91,7 @@ public class NoticeServiceImpl implements NoticeService {
     }
 
     @Override
-    public NoticeDisplayResp queryHistoryNotice(QueryNoticeReq queryNoticeReq) {
+    public NoticeHistoryResp queryHistoryNotice(QueryNoticeReq queryNoticeReq) {
         Integer pageNum = queryNoticeReq.getPageNum();
         Integer pageSize = queryNoticeReq.getPageSize();
 
@@ -111,7 +112,7 @@ public class NoticeServiceImpl implements NoticeService {
         List<Notice> records = pages.getRecords();
         List<NoticeDisplay> noticeDisplays = generateNoticeDisplayList(records);
 
-        return new NoticeDisplayResp(noticeDisplays);
+        return new NoticeHistoryResp(pages.getCurrent(), pages.getPages(), pages.getTotal(), noticeDisplays);
     }
 
     @Override
@@ -197,6 +198,7 @@ public class NoticeServiceImpl implements NoticeService {
         }
 
         notice.setStatus(Constants.NOTICE_PUBLISHED);
+        notice.setUpdateTime(LocalDateTime.now());
         return noticeMapper.update(notice, new LambdaQueryWrapper<Notice>().eq(Notice::getId, noticeId)) == 1;
     }
 
@@ -229,8 +231,9 @@ public class NoticeServiceImpl implements NoticeService {
             LocalDateTime updateTime = record.getUpdateTime();
             Integer recordType = record.getType();
             Integer recordStatus = record.getStatus();
+            Long id = record.getId();
 
-            NoticeResp noticeResp = BeanUtil.generateNoticeResp(username, recordTitle, recordType, recordStatus, createTime, updateTime);
+            NoticeResp noticeResp = BeanUtil.generateNoticeResp(id, username, recordTitle, recordType, recordStatus, createTime, updateTime);
             noticeResps.add(noticeResp);
         }
 
@@ -249,6 +252,7 @@ public class NoticeServiceImpl implements NoticeService {
                 username = "图书管理系统管理员";
             }
             LocalDateTime updateTime = record.getUpdateTime();
+            Long id = record.getId();
             Integer recordType = record.getType();
             Integer recordStatus = record.getStatus();
 

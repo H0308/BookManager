@@ -134,7 +134,7 @@ public class PurchaseRecordServiceImpl implements PurchaseRecordService {
             Integer status = record.getStatus();
             Integer purchaseCount = record.getPurchaseCount();
             BigDecimal purchasePrice = record.getPurchasePrice();
-            PurchaseRecordResp purchaseRecordResp = BeanUtil.generatePurchaseRecordResp(recordUsername,
+            PurchaseRecordResp purchaseRecordResp = BeanUtil.generatePurchaseRecordResp(record.getId(), recordUsername,
                     recordPhone, recordEmail, recordBookName, status, purchaseCount, purchasePrice);
             purchaseRecordResps.add(purchaseRecordResp);
         }

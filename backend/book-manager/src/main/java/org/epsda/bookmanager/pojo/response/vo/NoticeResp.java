@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class NoticeResp {
+    private Long id;
     private String username;
     private String title;
     private Integer type;

@@ -45,6 +45,9 @@ public class AuthServiceImpl implements AuthService {
 
         // 通过校验后，生成JWT Token
         User user = userMapper.selectByPreciseEmail(email);
+        if (Constants.DELETED_FIELD_FLAG.equals(user.getDeleteFlag())) {
+            throw new BookManagerException("当前用户已经处于注销状态，无法登录");
+        }
         String token = JwtUtil.generateToken(user.getEmail(), user.getUsername());
 
         // 返回登录响应

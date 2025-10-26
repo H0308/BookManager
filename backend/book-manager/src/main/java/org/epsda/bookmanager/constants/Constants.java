@@ -24,6 +24,9 @@ public record Constants() {
     public static final String REDIS_DEFAULT_PREFIX = "redis";
     public static final String RABBITMQ_USER_QUEUE = "user_queue";
     public static final String RABBITMQ_USER_EXCHANGE = "user_exchange";
+    public static final String RABBITMQ_PASSWORD_QUEUE = "password_queue";
+    public static final String RABBITMQ_PASSWORD_EXCHANGE = "password_exchange";
+
 
     public static final Integer NORMAL = 0;
     public static final Integer SERVER_ERROR = 1;

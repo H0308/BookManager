@@ -13,6 +13,7 @@ import lombok.Data;
  */
 @Data
 public class CategoryResp {
+    private Long id;
     private String categoryName;
     private Integer categoryCount;
 }

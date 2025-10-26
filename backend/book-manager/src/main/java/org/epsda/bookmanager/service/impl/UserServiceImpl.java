@@ -117,6 +117,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Boolean editUser(User user) {
+        SecurityUtil.checkHorizontalOverstepped(user.getId());
         // 如果传递的密码等于原密码，说明没有进行密码修改
         User oldUser = userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getId, user.getId())
                 .eq(User::getDeleteFlag, Constants.NOT_DELETE_FIELD_FLAG));
@@ -127,7 +128,7 @@ public class UserServiceImpl implements UserService {
         if (!oldUser.getPassword().equals(user.getPassword())) {
             // 需要处理密码邮件发送
             String passwordMail = JsonUtil.toJson(new PasswordMail(user.getUsername(), user.getEmail(), user.getPassword()));
-            rabbitTemplate.convertAndSend(Constants.RABBITMQ_USER_EXCHANGE, "", passwordMail);
+            rabbitTemplate.convertAndSend(Constants.RABBITMQ_PASSWORD_EXCHANGE, "", passwordMail);
             // 需要删除该登录状态，让用户重新登录
             log.info("用户修改了密码，新密码为：{}", user.getPassword());
         }

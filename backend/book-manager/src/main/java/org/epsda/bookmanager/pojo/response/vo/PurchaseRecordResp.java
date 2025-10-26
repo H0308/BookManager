@@ -15,6 +15,7 @@ import java.math.BigDecimal;
  */
 @Data
 public class PurchaseRecordResp {
+    private Long id;
     private String username;
     private String email;
     private String phone;

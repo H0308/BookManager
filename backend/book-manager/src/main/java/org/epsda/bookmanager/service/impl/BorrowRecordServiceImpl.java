@@ -149,7 +149,7 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
             LocalDateTime realReturnTime = record.getRealReturnTime();
             Integer status = record.getStatus();
             BigDecimal fine = record.getFine();
-            BorrowRecordResp borrowRecordResp = BeanUtil.generateBorrowRecordResp(recordUsername,
+            BorrowRecordResp borrowRecordResp = BeanUtil.generateBorrowRecordResp(record.getId(), recordUsername,
                     recordPhone, recordEmail, recordBookName, recordIsbn,
                     borrowTime, preReturnTime, realReturnTime,
                     status, fine);

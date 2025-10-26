@@ -30,4 +30,19 @@ public class RabbitmqConfig {
     public Binding userBinding(Queue userQueue, FanoutExchange userExchange) {
         return BindingBuilder.bind(userQueue).to(userExchange);
     }
+
+    @Bean
+    public Queue passwordQueue() {
+        return QueueBuilder.durable(Constants.RABBITMQ_PASSWORD_QUEUE).build();
+    }
+
+    @Bean
+    public FanoutExchange passwordExchange() {
+        return ExchangeBuilder.fanoutExchange(Constants.RABBITMQ_PASSWORD_EXCHANGE).durable(true).build();
+    }
+
+    @Bean
+    public Binding passwordBinding(Queue passwordQueue, FanoutExchange passwordExchange) {
+        return BindingBuilder.bind(passwordQueue).to(passwordExchange);
+    }
 }

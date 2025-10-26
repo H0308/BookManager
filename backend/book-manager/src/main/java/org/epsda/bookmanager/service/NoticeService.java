@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import org.epsda.bookmanager.pojo.Notice;
 import org.epsda.bookmanager.pojo.request.QueryNoticeReq;
 import org.epsda.bookmanager.pojo.response.NoticeDisplayResp;
+import org.epsda.bookmanager.pojo.response.NoticeHistoryResp;
 import org.epsda.bookmanager.pojo.response.QueryNoticeResp;
 
 import java.util.List;
@@ -22,7 +23,7 @@ public interface NoticeService {
 
     NoticeDisplayResp displayLatestNotices();
 
-    NoticeDisplayResp queryHistoryNotice(QueryNoticeReq queryNoticeReq);
+    NoticeHistoryResp queryHistoryNotice(QueryNoticeReq queryNoticeReq);
 
     Notice getNoticeById(Long noticeId);
 

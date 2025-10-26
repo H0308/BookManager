@@ -30,7 +30,7 @@ public class PasswordMailListener {
     private MailUtil mailUtil;
 
     @SneakyThrows
-    @RabbitListener(queues = Constants.RABBITMQ_USER_QUEUE)
+    @RabbitListener(queues = Constants.RABBITMQ_PASSWORD_QUEUE)
     public void mailListener(Message message, Channel channel) {
         long deliveryTag = message.getMessageProperties().getDeliveryTag();
         try {

@@ -13,6 +13,7 @@ import org.epsda.bookmanager.pojo.request.RegisterReq;
 import org.epsda.bookmanager.pojo.response.LoginResp;
 import org.epsda.bookmanager.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
