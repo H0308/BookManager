@@ -18,6 +18,7 @@ import org.epsda.bookmanager.pojo.response.vo.BookResp;
 import org.epsda.bookmanager.pojo.response.QueryBookResp;
 import org.epsda.bookmanager.service.BookService;
 import org.epsda.bookmanager.utils.BeanUtil;
+import org.epsda.bookmanager.utils.SecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -99,6 +100,9 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public Boolean addBook(Book book) {
+        if (!Constants.ADMIN_FLAG.equals(SecurityUtil.getRoleIdFromPrinciple())) {
+            throw new BookManagerException("当前用户无权新增图书");
+        }
         // 查看是否已经有存在的书籍
         LambdaQueryWrapper<Book> isbnWrapper = new LambdaQueryWrapper<Book>().eq(Book::getIsbn, book.getIsbn());
         Book existedNotDeleted = bookMapper.selectOne(isbnWrapper.eq(Book::getDeleteFlag, Constants.NOT_DELETE_FIELD_FLAG));
@@ -126,6 +130,9 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public Boolean editBook(Book book) {
+        if (!Constants.ADMIN_FLAG.equals(SecurityUtil.getRoleIdFromPrinciple())) {
+            throw new BookManagerException("当前用户无权编辑图书");
+        }
         LambdaQueryWrapper<Book> wrapper = new LambdaQueryWrapper<Book>().eq(Book::getId, book.getId()).eq(Book::getDeleteFlag, Constants.NOT_DELETE_FIELD_FLAG);
         return bookMapper.update(book, wrapper) == 1;
     }
@@ -137,6 +144,9 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public Boolean deleteBook(Long bookId) {
+        if (!Constants.ADMIN_FLAG.equals(SecurityUtil.getRoleIdFromPrinciple())) {
+            throw new BookManagerException("当前用户无权删除图书");
+        }
         // 先判断当前书籍是否有人借阅（借阅中）
         List<BorrowRecord> borrowRecordByBookId = borrowRecordMapper.getBorrowRecordByBookId(bookId);
         if (!borrowRecordByBookId.isEmpty()) {

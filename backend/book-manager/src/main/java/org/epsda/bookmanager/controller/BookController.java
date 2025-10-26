@@ -7,6 +7,7 @@ import org.epsda.bookmanager.pojo.request.QueryBookReq;
 import org.epsda.bookmanager.pojo.response.QueryBookResp;
 import org.epsda.bookmanager.pojo.response.dto.CustomUserDetails;
 import org.epsda.bookmanager.service.BookService;
+import org.epsda.bookmanager.utils.SecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -30,6 +31,7 @@ import java.util.List;
  */
 @RequestMapping("/book")
 @RestController
+@PreAuthorize("hasAnyRole('管理员', '普通用户')")
 public class BookController {
 
     @Autowired
@@ -37,14 +39,12 @@ public class BookController {
 
     // 获取图书
     @RequestMapping("/query")
-    @PreAuthorize("hasAnyRole('管理员', '普通用户')")
     public ResultWrapper<QueryBookResp> queryBooks(@Validated @RequestBody QueryBookReq queryBookReq) {
         return ResultWrapper.normal(bookService.queryBooks(queryBookReq));
     }
 
     // 通过id获取图书
     @RequestMapping("/get")
-    @PreAuthorize("hasAnyRole('管理员', '普通用户')")
     public ResultWrapper<Book> getBookById(@NotNull Long bookId) {
         return ResultWrapper.normal(bookService.getBookById(bookId));
     }
@@ -54,10 +54,6 @@ public class BookController {
     @RequestMapping("/add")
     @PreAuthorize("hasRole('管理员')")
     public ResultWrapper<Boolean> addBook(@Validated @RequestBody Book book) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        CustomUserDetails principal = (CustomUserDetails) authentication.getPrincipal();
-        System.out.println("当前操作人权限为：" + principal.getRoleId());
-        System.out.println(principal.getAuthorities());
         return ResultWrapper.normal(bookService.addBook(book));
     }
 
@@ -88,7 +84,6 @@ public class BookController {
     // 获取书籍有效个数
     // 普通用户和管理员都可以访问
     @RequestMapping("/getAvailableCount")
-    @PreAuthorize("hasAnyRole('管理员', '普通用户')")
     public ResultWrapper<Integer> getAvailableCount(@Validated @RequestBody Book book) {
         return ResultWrapper.normal(bookService.getAvailableCount(book));
     }
