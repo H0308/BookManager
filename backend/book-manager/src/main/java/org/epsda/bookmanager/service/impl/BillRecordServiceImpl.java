@@ -166,6 +166,7 @@ public class BillRecordServiceImpl implements BillRecordService {
         Long purchaseId = 0L;
         Long userId = 0L;
         // 防止水平越权
+        // 只对普通用户进行水平越权校验
         if (purchaseRecord != null) {
             SecurityUtil.checkHorizontalOverstepped(purchaseRecord.getUserId());
         }
@@ -198,7 +199,6 @@ public class BillRecordServiceImpl implements BillRecordService {
     @Override
     public DetailedBillRecord getDetailedBill(Long billId) {
         BillRecord billRecord = billRecordMapper.selectById(billId);
-        // 获取到用户ID进行水平越权校验
         SecurityUtil.checkHorizontalOverstepped(billRecord.getUserId());
         // 获取到借阅ID和账单ID
         Long borrowId = billRecord.getBorrowId();
@@ -221,7 +221,6 @@ public class BillRecordServiceImpl implements BillRecordService {
     public Boolean payBillRecord(Long billId) {
         // 获取到具体的账单
         BillRecord billRecord = billRecordMapper.selectById(billId);
-        // 防止水平越权
         SecurityUtil.checkHorizontalOverstepped(billRecord.getUserId());
         if (Constants.BILL_PAID_FLAG.equals(billRecord.getStatus())) {
             throw new BookManagerException("该账单已经支付，无法二次支付");
@@ -261,7 +260,6 @@ public class BillRecordServiceImpl implements BillRecordService {
     public Boolean deleteBillRecord(Long billId) {
         // 删除需要判断当前是否账单的状态为未支付
         BillRecord billRecord = billRecordMapper.selectById(billId);
-        // 防止水平越权
         SecurityUtil.checkHorizontalOverstepped(billRecord.getUserId());
         if (Constants.BILL_UNPAID_FLAG.equals(billRecord.getStatus())) {
             throw new BookManagerException("当前账单处于未支付状态，无法删除");
@@ -275,7 +273,7 @@ public class BillRecordServiceImpl implements BillRecordService {
     public List<BillRecordExcel> queryBillRecordsForExcel() {
         // 校验登录的用户的角色是否是管理员
         if (!Constants.ADMIN_FLAG.equals(SecurityUtil.getRoleIdFromPrinciple())) {
-            throw new BookManagerException("当前用户无权操作");
+            throw new BookManagerException("当前用户无权导出账单明细");
         }
         List<BillRecord> billRecords = billRecordMapper.selectList(null);
         List<BillRecordExcel> billRecordExcels = new ArrayList<>();
