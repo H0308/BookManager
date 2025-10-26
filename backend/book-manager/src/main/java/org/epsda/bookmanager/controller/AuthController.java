@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.epsda.bookmanager.common.ResultWrapper;
 import org.epsda.bookmanager.constants.Constants;
-import org.epsda.bookmanager.pojo.Captcha;
+import org.epsda.bookmanager.config.Captcha;
 import org.epsda.bookmanager.pojo.request.LoginReq;
 import org.epsda.bookmanager.pojo.request.RegisterReq;
 import org.epsda.bookmanager.pojo.response.LoginResp;

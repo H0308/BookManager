@@ -27,18 +27,20 @@ import java.util.List;
  */
 @RequestMapping("/user")
 @RestController
-@PreAuthorize("hasRole('管理员')")
+@PreAuthorize("hasAnyRole('管理员', '普通用户')")
 public class UserController {
 
     @Autowired
     private UserService userService;
 
     @RequestMapping("/query")
+    @PreAuthorize("hasRole('管理员')")
     public ResultWrapper<QueryUserResp> queryUsers(@Validated @RequestBody QueryUserReq queryUserReq) {
         return ResultWrapper.normal(userService.queryUsers(queryUserReq));
     }
 
     @RequestMapping("/add")
+    @PreAuthorize("hasRole('管理员')")
     public ResultWrapper<Boolean> addUser(@Validated @RequestBody User user) {
         return ResultWrapper.normal(userService.addUser(user));
     }
@@ -59,6 +61,7 @@ public class UserController {
     }
 
     @RequestMapping("/batchDelete")
+    @PreAuthorize("hasRole('管理员')")
     public ResultWrapper<Boolean> batchDeleteUser(@RequestParam List<Long> userIds) {
         return ResultWrapper.normal(userService.batchDeleteUser(userIds));
     }

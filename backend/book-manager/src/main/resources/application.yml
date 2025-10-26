@@ -1,6 +1,10 @@
 spring:
   application:
     name: book-manager
+  servlet:
+    multipart:
+      max-file-size: 5MB      # 单个文件最大5MB
+      max-request-size: 10MB  # 整个请求最大10MB
   datasource:
     url: jdbc:mysql://localhost:3306/book_manager?characterEncoding=utf8&useSSL=false
     username: root
@@ -53,5 +57,3 @@ avatar:
     path: E:\BookManager\backend\images
 admin:
   admin-name: book_admin_001
-jwt:
-  secret-key-signature: book_manager_spring_boot

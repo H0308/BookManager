@@ -114,17 +114,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUserById(Long userId) {
-        if (!Constants.ADMIN_FLAG.equals(SecurityUtil.getRoleIdFromPrinciple())) {
-            throw new BookManagerException("当前登录用户没有权限获取用户");
-        }
         return userMapper.selectById(userId);
     }
 
     @Override
     public Boolean editUser(User user) {
-        if (!Constants.ADMIN_FLAG.equals(SecurityUtil.getRoleIdFromPrinciple())) {
-            throw new BookManagerException("当前登录用户没有权限编辑用户");
-        }
         // 如果传递的密码等于原密码，说明没有进行密码修改
         User oldUser = userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getId, user.getId())
                 .eq(User::getDeleteFlag, Constants.NOT_DELETE_FIELD_FLAG));
@@ -145,9 +139,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Boolean deleteUser(Long userId) {
-        if (!Constants.ADMIN_FLAG.equals(SecurityUtil.getRoleIdFromPrinciple())) {
-            throw new BookManagerException("当前登录用户没有权限删除用户");
-        }
         // 检查当前用户是否有借阅（包括逾期）和待支付的订单
         User user = userMapper.selectById(userId);
         if (user.getBorrowRecordCount() != 0) {
@@ -178,5 +169,13 @@ public class UserServiceImpl implements UserService {
         }
 
         return count == userIds.size();
+    }
+    
+    @Override
+    public Boolean updateUserAvatar(Long userId, String avatarPath) {
+        User user = new User();
+        user.setId(userId);
+        user.setAvatar(avatarPath);
+        return userMapper.updateById(user) == 1;
     }
 }

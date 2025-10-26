@@ -1,4 +1,4 @@
-package org.epsda.bookmanager.pojo;
+package org.epsda.bookmanager.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

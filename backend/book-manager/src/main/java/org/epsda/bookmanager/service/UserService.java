@@ -27,4 +27,6 @@ public interface UserService {
     Boolean batchDeleteUser(List<Long> userIds);
 
     User getUserById(Long userId);
+    
+    Boolean updateUserAvatar(Long userId, String avatarPath);
 }
