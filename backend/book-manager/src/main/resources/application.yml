@@ -42,6 +42,12 @@ mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+captcha:
+  width: 100
+  height: 40
+  session:
+    key-name: captcha-key
+    date-name: captcha-date
 avatar:
   upload:
     path: E:\BookManager\backend\images

@@ -15,6 +15,9 @@ public record Constants() {
 
     public static final String SECURITY_ROLE_PREFIX = "ROLE_";
 
+    // 验证码有效时间
+    public static final long VALID_CAPTCHA_TIME = 60 * 1000;
+
     public static final String USER_INFO_REDIS_PREFIX = "user";
     public static final String BLOG_INFO_REDIS_PREFIX = "blog";
     public static final String REDIS_NAMESPACE_SEP = ":";
