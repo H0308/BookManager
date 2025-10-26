@@ -17,6 +17,7 @@ import org.epsda.bookmanager.service.BillRecordService;
 import org.epsda.bookmanager.service.BookService;
 import org.epsda.bookmanager.service.BorrowRecordService;
 import org.epsda.bookmanager.utils.BeanUtil;
+import org.epsda.bookmanager.utils.SecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -52,47 +53,15 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
 
     @Override
     public QueryBorrowRecordResp queryBorrowRecords(QueryBorrowRecordReq borrowRecordReq) {
+        SecurityUtil.checkHorizontalOverstepped(borrowRecordReq.getUserId());
+
         Integer pageNum = borrowRecordReq.getPageNum();
         Integer pageSize = borrowRecordReq.getPageSize();
 
         Page<BorrowRecord> page = new Page<>(pageNum, pageSize);
 
         LambdaQueryWrapper<BorrowRecord> wrapper = new LambdaQueryWrapper<>();
-        String username = borrowRecordReq.getUsername();
-        String phone = borrowRecordReq.getPhone();
-        String email = borrowRecordReq.getEmail();
         String bookName = borrowRecordReq.getBookName();
-        Integer timeDesc = borrowRecordReq.getTimeDesc();
-        LocalDateTime startTime = borrowRecordReq.getStartTime();
-        LocalDateTime endTime = borrowRecordReq.getEndTime();
-        if (timeDesc != null && (startTime == null || endTime == null)) {
-            throw new BookManagerException("请正确设置起始日期或者结束日期");
-        }
-
-        List<Long> usernameIds = new ArrayList<>();
-        usernameIds.add(0L);
-        if (StringUtils.hasText(username)) {
-            List<User> users = userMapper.selectByUsername(username);
-            if (users != null && !users.isEmpty()) {
-                usernameIds = users.stream().map(User::getId).toList();
-            }
-        }
-        List<Long> phoneIds = new ArrayList<>();
-        phoneIds.add(0L);
-        if (StringUtils.hasText(phone)) {
-            List<User> users = userMapper.selectByPhone(phone);
-            if (users != null && !users.isEmpty()) {
-                phoneIds = users.stream().map(User::getId).toList();
-            }
-        }
-        List<Long> emailIds = new ArrayList<>();
-        emailIds.add(0L);
-        if (StringUtils.hasText(phone)) {
-            List<User> users = userMapper.selectByEmail(email);
-            if (users != null && !users.isEmpty()) {
-                emailIds = users.stream().map(User::getId).toList();
-            }
-        }
         List<Long> bookNameIds = new ArrayList<>();
         bookNameIds.add(0L);
         if (StringUtils.hasText(bookName)) {
@@ -101,15 +70,58 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
                 bookNameIds = books.stream().map(Book::getId).toList();
             }
         }
+        if (Constants.USER_FLAG.equals(SecurityUtil.getRoleIdFromPrinciple())) {
+            // 普通用户逻辑
+            wrapper.in(StringUtils.hasText(bookName), BorrowRecord::getBookId, bookNameIds)
+                    .eq(borrowRecordReq.getStatus() != null, BorrowRecord::getStatus, borrowRecordReq.getStatus())
+                    .eq(BorrowRecord::getUserId, borrowRecordReq.getUserId())
+                    .eq(BorrowRecord::getDeleteFlag, Constants.NOT_DELETE_FIELD_FLAG);
+        } else if (Constants.ADMIN_FLAG.equals(SecurityUtil.getRoleIdFromPrinciple())){
+            // 管理员逻辑
+            String username = borrowRecordReq.getUsername();
+            String phone = borrowRecordReq.getPhone();
+            String email = borrowRecordReq.getEmail();
+            List<Long> usernameIds = new ArrayList<>();
+            usernameIds.add(0L);
+            if (StringUtils.hasText(username)) {
+                List<User> users = userMapper.selectByUsername(username);
+                if (users != null && !users.isEmpty()) {
+                    usernameIds = users.stream().map(User::getId).toList();
+                }
+            }
+            List<Long> phoneIds = new ArrayList<>();
+            phoneIds.add(0L);
+            if (StringUtils.hasText(phone)) {
+                List<User> users = userMapper.selectByPhone(phone);
+                if (users != null && !users.isEmpty()) {
+                    phoneIds = users.stream().map(User::getId).toList();
+                }
+            }
+            List<Long> emailIds = new ArrayList<>();
+            emailIds.add(0L);
+            if (StringUtils.hasText(phone)) {
+                List<User> users = userMapper.selectByEmail(email);
+                if (users != null && !users.isEmpty()) {
+                    emailIds = users.stream().map(User::getId).toList();
+                }
+            }
 
-        // 除了日期以外的字段不排序
-        wrapper.in(StringUtils.hasText(username), BorrowRecord::getUserId, usernameIds)
-                .in(StringUtils.hasText(email), BorrowRecord::getUserId, emailIds)
-                .in(StringUtils.hasText(phone), BorrowRecord::getUserId, phoneIds)
-                .in(StringUtils.hasText(bookName), BorrowRecord::getBookId, bookNameIds)
-                .eq(borrowRecordReq.getStatus() != null, BorrowRecord::getStatus, borrowRecordReq.getStatus())
-                .eq(BorrowRecord::getDeleteFlag, Constants.NOT_DELETE_FIELD_FLAG);
 
+            // 除了日期以外的字段不排序
+            wrapper.in(StringUtils.hasText(username), BorrowRecord::getUserId, usernameIds)
+                    .in(StringUtils.hasText(email), BorrowRecord::getUserId, emailIds)
+                    .in(StringUtils.hasText(phone), BorrowRecord::getUserId, phoneIds)
+                    .in(StringUtils.hasText(bookName), BorrowRecord::getBookId, bookNameIds)
+                    .eq(borrowRecordReq.getStatus() != null, BorrowRecord::getStatus, borrowRecordReq.getStatus())
+                    .eq(BorrowRecord::getDeleteFlag, Constants.NOT_DELETE_FIELD_FLAG);
+        }
+
+        Integer timeDesc = borrowRecordReq.getTimeDesc();
+        LocalDateTime startTime = borrowRecordReq.getStartTime();
+        LocalDateTime endTime = borrowRecordReq.getEndTime();
+        if (timeDesc != null && (startTime == null || endTime == null)) {
+            throw new BookManagerException("请正确设置起始日期或者结束日期");
+        }
         // 日期字段按照升序排序
         wrapper.between(timeDesc != null && timeDesc.equals(Constants.BORROW_TIME_DESC),
                         BorrowRecord::getBorrowTime, startTime, endTime).orderByAsc(BorrowRecord::getBorrowTime)
@@ -150,14 +162,15 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
     @Override
     public Boolean addBorrowRecord(BorrowRecord borrowRecord) {
         Long userId = borrowRecord.getUserId();
-        Long bookId = borrowRecord.getBookId();
-
-        List<BorrowRecord> borrowRecordByUserId = borrowRecordMapper.getBorrowRecordByUserId(userId);
         User user = userMapper.selectById(userId);
         // 检查用户是否存在
         if (user == null) {
             throw new BookManagerException("当前用户不存在，无法发起借阅");
         }
+        SecurityUtil.checkHorizontalOverstepped(borrowRecord.getUserId());
+
+        Long bookId = borrowRecord.getBookId();
+        List<BorrowRecord> borrowRecordByUserId = borrowRecordMapper.getBorrowRecordByUserId(userId);
 
         // 如果用户有逾期未缴费的书籍，必须先缴费
         for (var br : borrowRecordByUserId) {
@@ -209,14 +222,19 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
 
     @Override
     public BorrowRecord getBorrowRecordById(Long borrowId) {
-        return borrowRecordMapper.selectById(borrowId);
+        // 根据借阅ID获取到用户进行水平越权校验
+        BorrowRecord borrowRecord = borrowRecordMapper.selectById(borrowId);
+        SecurityUtil.checkHorizontalOverstepped(borrowRecord.getUserId());
+
+        return borrowRecord;
     }
 
     @Override
     public Boolean deleteBorrowRecord(Long borrowId) {
+        BorrowRecord borrowRecord = borrowRecordMapper.selectById(borrowId);
+        SecurityUtil.checkHorizontalOverstepped(borrowRecord.getUserId());
         // 需要判断当前借阅记录状态是否是已归还且未被比较为删除
         // 如果不是则无法进行删除
-        BorrowRecord borrowRecord = borrowRecordMapper.selectById(borrowId);
         if (Constants.BORROWING_FLAG.equals(borrowRecord.getStatus()) ||
             Constants.OVERDUE_FLAG.equals(borrowRecord.getStatus()) ||
             Constants.DELETED_FIELD_FLAG.equals(borrowRecord.getDeleteFlag())) {
@@ -242,6 +260,7 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
         // 否则设为已归还即可
         LocalDateTime now = LocalDateTime.now();
         BorrowRecord borrowRecord = borrowRecordMapper.selectById(borrowId);
+        SecurityUtil.checkHorizontalOverstepped(borrowRecord.getUserId());
         Long bookId = borrowRecord.getBookId();
         Book book = bookMapper.selectById(bookId);
         LocalDateTime preReturnTime = borrowRecord.getPreReturnTime();
@@ -270,7 +289,7 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
     public Boolean renewBook(Long borrowId) {
         // 默认续借30天
         BorrowRecord borrowRecord = borrowRecordMapper.selectById(borrowId);
-
+        SecurityUtil.checkHorizontalOverstepped(borrowRecord.getUserId());
         // 当前图书不能是已经删除的图书或者已经处于逾期或者已归还的图书
         if (Constants.OVERDUE_FLAG.equals(borrowRecord.getStatus())) {
             throw new BookManagerException("当前图书已经计算出罚金，不允许续借");
@@ -303,6 +322,8 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
 
     @Override
     public Boolean editBorrowRecord(BorrowRecord borrowRecord) {
+        SecurityUtil.checkHorizontalOverstepped(borrowRecord.getUserId());
+
         // 如果是修改借阅者，那么需要判断该借阅者是否满足借阅条件
         // 1. 没有逾期未缴费的书籍
         // 2. 没有借阅当前书籍
