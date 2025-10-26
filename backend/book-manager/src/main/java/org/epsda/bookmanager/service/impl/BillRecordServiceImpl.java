@@ -10,10 +10,14 @@ import org.epsda.bookmanager.pojo.request.QueryBillRecordReq;
 import org.epsda.bookmanager.pojo.response.DetailedBillRecord;
 import org.epsda.bookmanager.pojo.response.QueryBillRecordResp;
 import org.epsda.bookmanager.pojo.response.dto.BillRecordExcel;
+import org.epsda.bookmanager.pojo.response.dto.CustomUserDetails;
 import org.epsda.bookmanager.pojo.response.vo.BillRecordResp;
 import org.epsda.bookmanager.service.BillRecordService;
 import org.epsda.bookmanager.utils.BeanUtil;
+import org.epsda.bookmanager.utils.SecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -45,50 +49,64 @@ public class BillRecordServiceImpl implements BillRecordService {
     @Autowired
     private BookMapper bookMapper;
 
+    // 获取账单信息
+    // 管理员：获取所有订单信息
+    // 普通用户：只获取自己的订单信息
     @Override
     public QueryBillRecordResp queryBillRecords(QueryBillRecordReq queryBillRecordReq) {
+        Long userId = queryBillRecordReq.getUserId();
+        // 防止水平越权
+        SecurityUtil.checkHorizontalOverstepped(userId);
+
         Integer pageNum = queryBillRecordReq.getPageNum();
         Integer pageSize = queryBillRecordReq.getPageSize();
 
         Page<BillRecord> page = new Page<>(pageNum, pageSize);
-
         LambdaQueryWrapper<BillRecord> wrapper = new LambdaQueryWrapper<>();
-        String username = queryBillRecordReq.getUsername();
-        String email = queryBillRecordReq.getEmail();
-        String phone = queryBillRecordReq.getPhone();
         Integer status = queryBillRecordReq.getStatus();
-        // 根据用户名获取到用户id
-        List<Long> usernameIds = new ArrayList<>();
-        usernameIds.add(0L);
-        if (StringUtils.hasText(username)) {
-            List<User> users = userMapper.selectByUsername(username);
-            if (users != null && !users.isEmpty()) {
-                usernameIds = users.stream().map(User::getId).toList();
-            }
-        }
-        // 根据邮箱获取到用户id
-        List<Long> emailIds = new ArrayList<>();
-        emailIds.add(0L);
-        if (StringUtils.hasText(email)) {
-            List<User> users = userMapper.selectByEmail(email);
-            if (users != null && !users.isEmpty()) {
-                emailIds = users.stream().map(User::getId).toList();
-            }
-        }
-        // 根据电话获取到用户id
-        List<Long> phoneIds = new ArrayList<>();
-        phoneIds.add(0L);
-        if (StringUtils.hasText(phone)) {
-            List<User> users = userMapper.selectByPhone(phone);
-            if (users != null && !users.isEmpty()) {
-                phoneIds = users.stream().map(User::getId).toList();
-            }
-        }
 
-        wrapper.in(StringUtils.hasText(username), BillRecord::getUserId, usernameIds)
-                .in(StringUtils.hasText(email), BillRecord::getUserId, emailIds)
-                .in(StringUtils.hasText(phone), BillRecord::getUserId, phoneIds)
-                .eq(status != null, BillRecord::getStatus, status);
+        // 普通用户的逻辑
+        if (Constants.USER_FLAG.equals(SecurityUtil.getRoleIdFromPrinciple())) {
+            wrapper.eq(BillRecord::getUserId, userId) // 需要查找指定用户id的用户账单
+                    .eq(status != null, BillRecord::getStatus, status); // 可以根据订单状态查询
+        } else if (Constants.ADMIN_FLAG.equals(SecurityUtil.getRoleIdFromPrinciple())) {
+            // 下面是管理员的逻辑
+            String username = queryBillRecordReq.getUsername();
+            String email = queryBillRecordReq.getEmail();
+            String phone = queryBillRecordReq.getPhone();
+            // 根据用户名获取到用户id
+            List<Long> usernameIds = new ArrayList<>();
+            usernameIds.add(0L);
+            if (StringUtils.hasText(username)) {
+                List<User> users = userMapper.selectByUsername(username);
+                if (users != null && !users.isEmpty()) {
+                    usernameIds = users.stream().map(User::getId).toList();
+                }
+            }
+            // 根据邮箱获取到用户id
+            List<Long> emailIds = new ArrayList<>();
+            emailIds.add(0L);
+            if (StringUtils.hasText(email)) {
+                List<User> users = userMapper.selectByEmail(email);
+                if (users != null && !users.isEmpty()) {
+                    emailIds = users.stream().map(User::getId).toList();
+                }
+            }
+            // 根据电话获取到用户id
+            List<Long> phoneIds = new ArrayList<>();
+            phoneIds.add(0L);
+            if (StringUtils.hasText(phone)) {
+                List<User> users = userMapper.selectByPhone(phone);
+                if (users != null && !users.isEmpty()) {
+                    phoneIds = users.stream().map(User::getId).toList();
+                }
+            }
+
+            wrapper.in(StringUtils.hasText(username), BillRecord::getUserId, usernameIds)
+                    .in(StringUtils.hasText(email), BillRecord::getUserId, emailIds)
+                    .in(StringUtils.hasText(phone), BillRecord::getUserId, phoneIds)
+                    .eq(status != null, BillRecord::getStatus, status);
+        }
 
         Page<BillRecord> pages = billRecordMapper.selectPage(page, wrapper);
         List<BillRecord> records = pages.getRecords();
@@ -109,10 +127,15 @@ public class BillRecordServiceImpl implements BillRecordService {
         return new QueryBillRecordResp(pages.getCurrent(), pages.getPages(), pages.getTotal(), billRecordResps);
     }
 
+    // 更新借阅状态
     @Override
     public Boolean insertOrUpdateBillRecordWithBorrowRecord(BorrowRecord borrowRecord) {
         Long borrowId = 0L;
         Long userId = 0L;
+        // 防止水平越权
+        if (borrowRecord != null) {
+            SecurityUtil.checkHorizontalOverstepped(borrowRecord.getUserId());
+        }
         if (borrowRecord != null && Constants.OVERDUE_FLAG.equals(borrowRecord.getStatus())) {
             borrowId = borrowRecord.getId();
             userId = borrowRecord.getUserId();
@@ -142,6 +165,10 @@ public class BillRecordServiceImpl implements BillRecordService {
     public Boolean insertOrUpdateBillRecordWithPurchaseRecord(PurchaseRecord purchaseRecord) {
         Long purchaseId = 0L;
         Long userId = 0L;
+        // 防止水平越权
+        if (purchaseRecord != null) {
+            SecurityUtil.checkHorizontalOverstepped(purchaseRecord.getUserId());
+        }
         if (purchaseRecord != null && Constants.BOOK_UNPAID_FLAG.equals(purchaseRecord.getStatus())) {
             purchaseId = purchaseRecord.getId();
             userId = purchaseRecord.getUserId();
@@ -167,9 +194,12 @@ public class BillRecordServiceImpl implements BillRecordService {
         return true;
     }
 
+    // 获取订单详情
     @Override
     public DetailedBillRecord getDetailedBill(Long billId) {
         BillRecord billRecord = billRecordMapper.selectById(billId);
+        // 获取到用户ID进行水平越权校验
+        SecurityUtil.checkHorizontalOverstepped(billRecord.getUserId());
         // 获取到借阅ID和账单ID
         Long borrowId = billRecord.getBorrowId();
         Long purchaseId = billRecord.getPurchaseId();
@@ -191,6 +221,8 @@ public class BillRecordServiceImpl implements BillRecordService {
     public Boolean payBillRecord(Long billId) {
         // 获取到具体的账单
         BillRecord billRecord = billRecordMapper.selectById(billId);
+        // 防止水平越权
+        SecurityUtil.checkHorizontalOverstepped(billRecord.getUserId());
         if (Constants.BILL_PAID_FLAG.equals(billRecord.getStatus())) {
             throw new BookManagerException("该账单已经支付，无法二次支付");
         }
@@ -229,6 +261,8 @@ public class BillRecordServiceImpl implements BillRecordService {
     public Boolean deleteBillRecord(Long billId) {
         // 删除需要判断当前是否账单的状态为未支付
         BillRecord billRecord = billRecordMapper.selectById(billId);
+        // 防止水平越权
+        SecurityUtil.checkHorizontalOverstepped(billRecord.getUserId());
         if (Constants.BILL_UNPAID_FLAG.equals(billRecord.getStatus())) {
             throw new BookManagerException("当前账单处于未支付状态，无法删除");
         }
@@ -239,6 +273,10 @@ public class BillRecordServiceImpl implements BillRecordService {
 
     @Override
     public List<BillRecordExcel> queryBillRecordsForExcel() {
+        // 校验登录的用户的角色是否是管理员
+        if (!Constants.ADMIN_FLAG.equals(SecurityUtil.getRoleIdFromPrinciple())) {
+            throw new BookManagerException("当前用户无权操作");
+        }
         List<BillRecord> billRecords = billRecordMapper.selectList(null);
         List<BillRecordExcel> billRecordExcels = new ArrayList<>();
         for (var billRecord : billRecords) {
@@ -294,6 +332,7 @@ public class BillRecordServiceImpl implements BillRecordService {
         if (billRecord == null) {
             throw new BookManagerException("指定的账单记录不存在");
         }
+        SecurityUtil.checkHorizontalOverstepped(billRecord.getUserId());
 
         billRecord.setBorrowId(0L);
 
@@ -312,6 +351,7 @@ public class BillRecordServiceImpl implements BillRecordService {
         if (billRecord == null) {
             throw new BookManagerException("指定的账单记录不存在");
         }
+        SecurityUtil.checkHorizontalOverstepped(billRecord.getUserId());
 
         billRecord.setPurchaseId(0L);
 

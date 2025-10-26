@@ -48,7 +48,9 @@ public class AuthServiceImpl implements AuthService {
         String token = JwtUtil.generateToken(user.getEmail(), user.getUsername());
 
         // 返回登录响应
-        return new LoginResp(user.getUsername(), user.getRoleId(), token);
+        // 此处可以对这个userId参数使用非对称密钥的公钥进行加密，例如RSA
+        // 前端传递该参数给后端，后端使用私钥解密
+        return new LoginResp(user.getId(), user.getUsername(), user.getRoleId(), token);
     }
 
     @Override

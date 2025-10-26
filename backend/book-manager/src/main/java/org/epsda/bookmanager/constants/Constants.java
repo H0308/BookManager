@@ -27,7 +27,7 @@ public record Constants() {
     public static final Integer SYSTEM_ERROR = 2;
     public static final Integer RESOURCE_NOT_FOUND = 3;
     public static final String SERVER_ERROR_MESSAGE = "服务器异常";
-    public static final String SYSTEM_ERROR_MESSAGE = "博客系统异常";
+    public static final String SYSTEM_ERROR_MESSAGE = "图书管理系统异常";
     public static final String RESOURCE_NOT_FOUND_MESSAGE = "资源不存在";
 
     public static final long REDIS_EXPIRE_TIMEOUT = 14 * 24 * 60 * 60; // 2周，单位为s

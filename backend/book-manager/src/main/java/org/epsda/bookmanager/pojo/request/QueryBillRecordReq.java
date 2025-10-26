@@ -1,5 +1,6 @@
 package org.epsda.bookmanager.pojo.request;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,6 +18,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class QueryBillRecordReq {
+    @NotNull
+    private Long userId; // 由前端必须传递
     private Integer pageNum = 1;
     // 默认一页内容为10条
     private Integer pageSize = 10;
