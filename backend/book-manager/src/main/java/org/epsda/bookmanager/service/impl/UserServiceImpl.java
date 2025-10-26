@@ -173,6 +173,7 @@ public class UserServiceImpl implements UserService {
     
     @Override
     public Boolean updateUserAvatar(Long userId, String avatarPath) {
+        SecurityUtil.checkHorizontalOverstepped(userId);
         User user = new User();
         user.setId(userId);
         user.setAvatar(avatarPath);
