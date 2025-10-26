@@ -17,6 +17,7 @@ import org.epsda.bookmanager.service.BillRecordService;
 import org.epsda.bookmanager.service.BookService;
 import org.epsda.bookmanager.service.PurchaseRecordService;
 import org.epsda.bookmanager.utils.BeanUtil;
+import org.epsda.bookmanager.utils.SecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -50,44 +51,17 @@ public class PurchaseRecordServiceImpl implements PurchaseRecordService {
 
     @Override
     public QueryPurchaseRecordResp queryPurchaseRecords(QueryPurchaseRecordReq queryPurchaseRecordReq) {
+        // 先进行水平越权校验
+        SecurityUtil.checkHorizontalOverstepped(queryPurchaseRecordReq.getUserId());
+
         Integer pageNum = queryPurchaseRecordReq.getPageNum();
         Integer pageSize = queryPurchaseRecordReq.getPageSize();
 
         Page<PurchaseRecord> page = new Page<>(pageNum, pageSize);
 
         LambdaQueryWrapper<PurchaseRecord> wrapper = new LambdaQueryWrapper<>();
-        String username = queryPurchaseRecordReq.getUsername();
-        String email = queryPurchaseRecordReq.getEmail();
-        String phone = queryPurchaseRecordReq.getPhone();
         String bookName = queryPurchaseRecordReq.getBookName();
 
-        // 根据用户名获取到用户id
-        List<Long> usernameIds = new ArrayList<>();
-        usernameIds.add(0L);
-        if (StringUtils.hasText(username)) {
-            List<User> users = userMapper.selectByUsername(username);
-            if (users != null && !users.isEmpty()) {
-                usernameIds = users.stream().map(User::getId).toList();
-            }
-        }
-        // 根据邮箱获取到用户id
-        List<Long> emailIds = new ArrayList<>();
-        emailIds.add(0L);
-        if (StringUtils.hasText(email)) {
-            List<User> users = userMapper.selectByEmail(email);
-            if (users != null && !users.isEmpty()) {
-                emailIds = users.stream().map(User::getId).toList();
-            }
-        }
-        // 根据电话获取到用户id
-        List<Long> phoneIds = new ArrayList<>();
-        phoneIds.add(0L);
-        if (StringUtils.hasText(phone)) {
-            List<User> users = userMapper.selectByPhone(phone);
-            if (users != null && !users.isEmpty()) {
-                phoneIds = users.stream().map(User::getId).toList();
-            }
-        }
         // 根据书名获取到图书id
         List<Long> bookNameIds = new ArrayList<>();
         bookNameIds.add(0L);
@@ -98,12 +72,52 @@ public class PurchaseRecordServiceImpl implements PurchaseRecordService {
             }
         }
 
-        wrapper.in(StringUtils.hasText(username), PurchaseRecord::getUserId, usernameIds)
-                .in(StringUtils.hasText(email), PurchaseRecord::getUserId, emailIds)
-                .in(StringUtils.hasText(phone), PurchaseRecord::getUserId, phoneIds)
-                .in(StringUtils.hasText(bookName), PurchaseRecord::getBookId, bookNameIds)
-                .eq(queryPurchaseRecordReq.getStatus() != null,
-                        PurchaseRecord::getStatus, queryPurchaseRecordReq.getStatus());
+        if (Constants.USER_FLAG.equals(SecurityUtil.getRoleIdFromPrinciple())) {
+            // 普通用户逻辑
+            wrapper.in(StringUtils.hasText(bookName), PurchaseRecord::getBookId, bookNameIds)
+                    .eq(queryPurchaseRecordReq.getStatus() != null,
+                            PurchaseRecord::getStatus, queryPurchaseRecordReq.getStatus())
+                    .eq(PurchaseRecord::getUserId, queryPurchaseRecordReq.getUserId());
+        } else if (Constants.ADMIN_FLAG.equals(SecurityUtil.getRoleIdFromPrinciple())) {
+            // 管理员逻辑
+            String username = queryPurchaseRecordReq.getUsername();
+            String email = queryPurchaseRecordReq.getEmail();
+            String phone = queryPurchaseRecordReq.getPhone();
+            // 根据用户名获取到用户id
+            List<Long> usernameIds = new ArrayList<>();
+            usernameIds.add(0L);
+            if (StringUtils.hasText(username)) {
+                List<User> users = userMapper.selectByUsername(username);
+                if (users != null && !users.isEmpty()) {
+                    usernameIds = users.stream().map(User::getId).toList();
+                }
+            }
+            // 根据邮箱获取到用户id
+            List<Long> emailIds = new ArrayList<>();
+            emailIds.add(0L);
+            if (StringUtils.hasText(email)) {
+                List<User> users = userMapper.selectByEmail(email);
+                if (users != null && !users.isEmpty()) {
+                    emailIds = users.stream().map(User::getId).toList();
+                }
+            }
+            // 根据电话获取到用户id
+            List<Long> phoneIds = new ArrayList<>();
+            phoneIds.add(0L);
+            if (StringUtils.hasText(phone)) {
+                List<User> users = userMapper.selectByPhone(phone);
+                if (users != null && !users.isEmpty()) {
+                    phoneIds = users.stream().map(User::getId).toList();
+                }
+            }
+
+            wrapper.in(StringUtils.hasText(username), PurchaseRecord::getUserId, usernameIds)
+                    .in(StringUtils.hasText(email), PurchaseRecord::getUserId, emailIds)
+                    .in(StringUtils.hasText(phone), PurchaseRecord::getUserId, phoneIds)
+                    .in(StringUtils.hasText(bookName), PurchaseRecord::getBookId, bookNameIds)
+                    .eq(queryPurchaseRecordReq.getStatus() != null,
+                            PurchaseRecord::getStatus, queryPurchaseRecordReq.getStatus());
+        }
 
         Page<PurchaseRecord> pages = purchaseRecordMapper.selectPage(page, wrapper);
         List<PurchaseRecord> records = pages.getRecords();
@@ -130,6 +144,9 @@ public class PurchaseRecordServiceImpl implements PurchaseRecordService {
 
     @Override
     public Boolean addPurchaseRecord(PurchaseRecord purchaseRecord) {
+        Long userId = purchaseRecord.getUserId();
+        User user = userMapper.selectById(userId);
+        SecurityUtil.checkHorizontalOverstepped(userId);
         // 添加借阅记录必须保证书籍有空闲数量且书籍没有被标记为删除
         Long bookId = purchaseRecord.getBookId();
         Book book = bookMapper.selectById(bookId);
@@ -140,8 +157,6 @@ public class PurchaseRecordServiceImpl implements PurchaseRecordService {
         }
 
         // 借阅者必须处于未注销的状态
-        Long userId = purchaseRecord.getUserId();
-        User user = userMapper.selectById(userId);
         if (Constants.DELETED_FIELD_FLAG.equals(user.getDeleteFlag())) {
             throw new BookManagerException("当前用户处于注销状态，无法购买书籍");
         }
@@ -181,11 +196,15 @@ public class PurchaseRecordServiceImpl implements PurchaseRecordService {
 
     @Override
     public PurchaseRecord getPurchaseRecordByPurchaseId(Long purchaseId) {
-        return purchaseRecordMapper.selectById(purchaseId);
+        PurchaseRecord purchaseRecord = purchaseRecordMapper.selectById(purchaseId);
+        SecurityUtil.checkHorizontalOverstepped(purchaseRecord.getUserId());
+
+        return purchaseRecord;
     }
 
     @Override
     public Boolean editPurchaseRecord(PurchaseRecord purchaseRecord) {
+        SecurityUtil.checkHorizontalOverstepped(purchaseRecord.getUserId());
         // 如果修改的是读者，那么需要确保该读者有购买书籍的资格
         Long purchaseRecordId = purchaseRecord.getId();
         PurchaseRecord oldPurchaseRecord = purchaseRecordMapper.selectById(purchaseRecordId);
@@ -242,12 +261,14 @@ public class PurchaseRecordServiceImpl implements PurchaseRecordService {
 
     @Override
     public Boolean cancelPurchasing(Long purchaseId) {
+        PurchaseRecord purchaseRecord = purchaseRecordMapper.selectById(purchaseId);
+        User user = userMapper.selectById(purchaseRecord.getUserId());
+        SecurityUtil.checkHorizontalOverstepped(user.getId());
+
         // 如果状态是未付款状态，那么就是取消
         // 否则是退款
         // 但是本项目不考虑退款，所以二者处理方式是一致的
-        PurchaseRecord purchaseRecord = purchaseRecordMapper.selectById(purchaseId);
         Book book = bookMapper.selectById(purchaseRecord.getBookId());
-        User user = userMapper.selectById(purchaseRecord.getUserId());
         user.setPurchaseRecordCount(user.getPurchaseRecordCount() - purchaseRecord.getPurchaseCount());
         return purchaseRecordMapper.delete(new LambdaQueryWrapper<PurchaseRecord>().eq(PurchaseRecord::getId, purchaseId)) == 1 &&
                 userMapper.update(user, new LambdaQueryWrapper<User>().eq(User::getId, user.getId())) == 1 &&
