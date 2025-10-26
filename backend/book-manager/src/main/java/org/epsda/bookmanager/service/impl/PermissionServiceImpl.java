@@ -14,6 +14,7 @@ import org.epsda.bookmanager.pojo.response.QueryRoleResp;
 import org.epsda.bookmanager.pojo.response.vo.RoleResp;
 import org.epsda.bookmanager.service.PermissionService;
 import org.epsda.bookmanager.utils.BeanUtil;
+import org.epsda.bookmanager.utils.SecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -44,6 +45,10 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public QueryRoleResp queryRoles(QueryRoleReq queryRoleReq) {
+        if (Constants.USER_FLAG.equals(SecurityUtil.getRoleIdFromPrinciple())) {
+            throw new BookManagerException("当前用户无权进行查询权限信息");
+        }
+
         Integer pageNum = queryRoleReq.getPageNum();
         Integer pageSize = queryRoleReq.getPageSize();
 
@@ -79,6 +84,9 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public Boolean changeRole(RoleChangeReq roleChangeReq) {
+        if (Constants.USER_FLAG.equals(SecurityUtil.getRoleIdFromPrinciple())) {
+            throw new BookManagerException("当前用户无权进行改变权限信息");
+        }
         Long userId = roleChangeReq.getUserId();
         User user = userMapper.selectById(userId);
         // 先判断当前用户是否已经被标记为注销

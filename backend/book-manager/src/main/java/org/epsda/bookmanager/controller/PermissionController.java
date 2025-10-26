@@ -6,6 +6,7 @@ import org.epsda.bookmanager.pojo.request.RoleChangeReq;
 import org.epsda.bookmanager.pojo.response.QueryRoleResp;
 import org.epsda.bookmanager.service.PermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RequestMapping("/permission")
 @RestController
+@PreAuthorize("hasRole('管理员')")
 public class PermissionController {
 
     @Autowired
