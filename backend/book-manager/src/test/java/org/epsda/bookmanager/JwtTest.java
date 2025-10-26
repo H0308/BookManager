@@ -6,8 +6,6 @@ import org.epsda.bookmanager.utils.JwtUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import javax.crypto.SecretKey;
-
 /**
  * Created with IntelliJ IDEA.
  * Description:
@@ -24,7 +22,6 @@ public class JwtTest {
         String email = "qiuyiba@qq.com";
         String username = "求一把";
         String token = JwtUtil.generateToken(email, username);
-        String tokenUsername = JwtUtil.extractUsername(token);
         String tokenEmail = JwtUtil.extractEmail(token);
         System.out.println(username);
         System.out.println(tokenEmail);

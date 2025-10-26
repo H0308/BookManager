@@ -3,9 +3,7 @@ package org.epsda.bookmanager.utils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.io.Encoders;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Value;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
