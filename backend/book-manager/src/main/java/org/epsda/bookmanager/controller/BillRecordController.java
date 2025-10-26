@@ -51,11 +51,7 @@ public class BillRecordController {
     // 普通用户只获取到自己的账单信息
     @RequestMapping("/query")
     public ResultWrapper<QueryBillRecordResp> queryBillRecords(@Validated @RequestBody QueryBillRecordReq queryBillRecordReq) {
-        // 只对普通用户进行水平越权校验
-        if (Constants.USER_FLAG.equals(SecurityUtil.getRoleIdFromPrinciple())) {
-            // 防止水平越权
-            SecurityUtil.checkHorizontalOverstepped(queryBillRecordReq.getUserId());
-        }
+        SecurityUtil.checkHorizontalOverstepped(queryBillRecordReq.getUserId());
         return ResultWrapper.normal(billRecordService.queryBillRecords(queryBillRecordReq));
     }
 
@@ -64,11 +60,8 @@ public class BillRecordController {
     // 普通用户必须确保获取的账单只属于自己
     @RequestMapping("/get")
     public ResultWrapper<DetailedBillRecord> getDetailedBill(@NotNull Long billId, @NotNull Long userId) {
-        // 只对普通用户进行水平越权校验
-        if (Constants.USER_FLAG.equals(SecurityUtil.getRoleIdFromPrinciple())) {
-            // 防止水平越权
-            SecurityUtil.checkHorizontalOverstepped(userId);
-        }
+        // 防止水平越权
+        SecurityUtil.checkHorizontalOverstepped(userId);
         return ResultWrapper.normal(billRecordService.getDetailedBill(billId));
     }
 
@@ -77,11 +70,8 @@ public class BillRecordController {
     // 普通用户必须确保待支付的账单只属于自己
     @RequestMapping("/pay")
     public ResultWrapper<Boolean> payBillRecord(@NotNull Long billId, @NotNull Long userId) {
-        // 只对普通用户进行水平越权校验
-        if (Constants.USER_FLAG.equals(SecurityUtil.getRoleIdFromPrinciple())) {
-            // 防止水平越权
-            SecurityUtil.checkHorizontalOverstepped(userId);
-        }
+        // 防止水平越权
+        SecurityUtil.checkHorizontalOverstepped(userId);
         return ResultWrapper.normal(billRecordService.payBillRecord(billId));
     }
 
@@ -90,22 +80,16 @@ public class BillRecordController {
     // 普通用户必须确保待删除的账单只属于自己
     @RequestMapping("/delete")
     public ResultWrapper<Boolean> deleteBillRecord(@NotNull Long billId, @NotNull Long userId) {
-        // 只对普通用户进行水平越权校验
-        if (Constants.USER_FLAG.equals(SecurityUtil.getRoleIdFromPrinciple())) {
-            // 防止水平越权
-            SecurityUtil.checkHorizontalOverstepped(userId);
-        }
+        // 防止水平越权
+        SecurityUtil.checkHorizontalOverstepped(userId);
         return ResultWrapper.normal(billRecordService.deleteBillRecord(billId));
     }
 
     // 批量删除，逻辑同单一删除
     @RequestMapping("/batchDelete")
     public ResultWrapper<Boolean> batchDeleteBillRecord(@RequestParam List<Long> billIds, @NotNull Long userId) {
-        // 只对普通用户进行水平越权校验
-        if (Constants.USER_FLAG.equals(SecurityUtil.getRoleIdFromPrinciple())) {
-            // 防止水平越权
-            SecurityUtil.checkHorizontalOverstepped(userId);
-        }
+        // 防止水平越权
+        SecurityUtil.checkHorizontalOverstepped(userId);
         return ResultWrapper.normal(billRecordService.batchDeleteBillRecord(billIds));
     }
 
@@ -135,8 +119,7 @@ public class BillRecordController {
     // 但是校验方便，所以在controller层也可以进行一次校验
     @RequestMapping("/insertOrUpdateBillRecordWithBorrowRecord")
     public ResultWrapper<Boolean> insertOrUpdateBillRecordWithBorrowRecord(@RequestBody BorrowRecord borrowRecord) {
-        // 只对普通用户进行水平越权校验
-        if (borrowRecord != null && Constants.USER_FLAG.equals(SecurityUtil.getRoleIdFromPrinciple())) {
+        if (borrowRecord != null) {
             SecurityUtil.checkHorizontalOverstepped(borrowRecord.getUserId());
         }
         return ResultWrapper.normal(billRecordService.insertOrUpdateBillRecordWithBorrowRecord(borrowRecord));
@@ -146,8 +129,7 @@ public class BillRecordController {
     // 但是校验方便，所以在controller层也可以进行一次校验
     @RequestMapping("/insertOrUpdateBillRecordWithPurchaseRecord")
     public ResultWrapper<Boolean> insertOrUpdateBillRecordWithPurchaseRecord(@RequestBody PurchaseRecord purchaseRecord) {
-        // 只对普通用户进行水平越权校验
-        if (purchaseRecord != null && Constants.USER_FLAG.equals(SecurityUtil.getRoleIdFromPrinciple())) {
+        if (purchaseRecord != null) {
             SecurityUtil.checkHorizontalOverstepped(purchaseRecord.getUserId());
         }
         return ResultWrapper.normal(billRecordService.insertOrUpdateBillRecordWithPurchaseRecord(purchaseRecord));
