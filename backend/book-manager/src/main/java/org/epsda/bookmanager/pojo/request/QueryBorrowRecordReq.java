@@ -1,5 +1,6 @@
 package org.epsda.bookmanager.pojo.request;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import java.time.LocalDateTime;
 
@@ -14,6 +15,8 @@ import java.time.LocalDateTime;
  */
 @Data
 public class QueryBorrowRecordReq {
+    @NotNull
+    private Long userId; // 由前端必须传递
     private Integer pageNum = 1;
     private Integer pageSize = 10;
     private String username;

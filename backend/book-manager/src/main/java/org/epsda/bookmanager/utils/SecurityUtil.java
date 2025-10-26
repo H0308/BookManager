@@ -1,5 +1,6 @@
 package org.epsda.bookmanager.utils;
 
+import org.epsda.bookmanager.constants.Constants;
 import org.epsda.bookmanager.exception.BookManagerException;
 import org.epsda.bookmanager.pojo.response.dto.CustomUserDetails;
 import org.springframework.security.core.Authentication;
@@ -20,7 +21,8 @@ public class SecurityUtil {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         CustomUserDetails principal = (CustomUserDetails) authentication.getPrincipal();
         Long securityUserId = principal.getUserId();
-        if (!securityUserId.equals(frontendUserId)) {
+        // 只对普通用户进行校验
+        if (Constants.USER_FLAG.equals(getRoleIdFromPrinciple()) && !securityUserId.equals(frontendUserId)) {
             throw new BookManagerException("不允许访问非当前登录用户的资源");
         }
     }

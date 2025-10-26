@@ -1,5 +1,6 @@
 package org.epsda.bookmanager.pojo.request;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 /**
@@ -13,6 +14,8 @@ import lombok.Data;
  */
 @Data
 public class QueryPurchaseRecordReq {
+    @NotNull
+    private Long userId; // 由前端必须传递
     private Integer pageNum = 1;
     private Integer pageSize = 10;
     private String username;

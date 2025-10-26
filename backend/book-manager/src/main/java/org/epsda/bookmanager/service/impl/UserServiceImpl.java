@@ -17,6 +17,7 @@ import org.epsda.bookmanager.pojo.response.vo.UserResp;
 import org.epsda.bookmanager.service.UserService;
 import org.epsda.bookmanager.utils.BeanUtil;
 import org.epsda.bookmanager.utils.JsonUtil;
+import org.epsda.bookmanager.utils.SecurityUtil;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -51,6 +52,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public QueryUserResp queryUsers(QueryUserReq queryUserReq) {
+        if (!Constants.ADMIN_FLAG.equals(SecurityUtil.getRoleIdFromPrinciple())) {
+            throw new BookManagerException("当前登录用户没有权限查询用户");
+        }
+
         Integer pageNum = queryUserReq.getPageNum();
         Integer pageSize = queryUserReq.getPageSize();
 
@@ -76,6 +81,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Boolean addUser(User user) {
+        if (!Constants.ADMIN_FLAG.equals(SecurityUtil.getRoleIdFromPrinciple())) {
+            throw new BookManagerException("当前登录用户没有权限新增用户");
+        }
         // 根据身份证号判断插入的用户是否已经存在过
         LambdaQueryWrapper<User> idCardWrapper = new LambdaQueryWrapper<User>().eq(User::getUserIdCard, user.getUserIdCard()).eq(User::getDeleteFlag, Constants.NOT_DELETE_FIELD_FLAG);
         User existed = userMapper.selectOne(idCardWrapper);
@@ -106,11 +114,17 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUserById(Long userId) {
+        if (!Constants.ADMIN_FLAG.equals(SecurityUtil.getRoleIdFromPrinciple())) {
+            throw new BookManagerException("当前登录用户没有权限获取用户");
+        }
         return userMapper.selectById(userId);
     }
 
     @Override
     public Boolean editUser(User user) {
+        if (!Constants.ADMIN_FLAG.equals(SecurityUtil.getRoleIdFromPrinciple())) {
+            throw new BookManagerException("当前登录用户没有权限编辑用户");
+        }
         // 如果传递的密码等于原密码，说明没有进行密码修改
         User oldUser = userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getId, user.getId())
                 .eq(User::getDeleteFlag, Constants.NOT_DELETE_FIELD_FLAG));
@@ -131,6 +145,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Boolean deleteUser(Long userId) {
+        if (!Constants.ADMIN_FLAG.equals(SecurityUtil.getRoleIdFromPrinciple())) {
+            throw new BookManagerException("当前登录用户没有权限删除用户");
+        }
         // 检查当前用户是否有借阅（包括逾期）和待支付的订单
         User user = userMapper.selectById(userId);
         if (user.getBorrowRecordCount() != 0) {

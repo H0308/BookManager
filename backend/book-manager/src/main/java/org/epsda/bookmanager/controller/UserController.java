@@ -7,6 +7,7 @@ import org.epsda.bookmanager.pojo.request.QueryUserReq;
 import org.epsda.bookmanager.pojo.response.QueryUserResp;
 import org.epsda.bookmanager.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +27,7 @@ import java.util.List;
  */
 @RequestMapping("/user")
 @RestController
+@PreAuthorize("hasRole('管理员')")
 public class UserController {
 
     @Autowired
