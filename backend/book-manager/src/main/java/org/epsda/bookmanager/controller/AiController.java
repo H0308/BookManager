@@ -1,9 +1,13 @@
 package org.epsda.bookmanager.controller;
 
+import org.epsda.bookmanager.exception.BookManagerException;
 import org.epsda.bookmanager.pojo.request.AiReq;
 import org.epsda.bookmanager.service.UserService;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
