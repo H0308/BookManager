@@ -8,6 +8,7 @@ import org.epsda.bookmanager.pojo.response.NoticeDisplayResp;
 import org.epsda.bookmanager.pojo.response.QueryNoticeResp;
 import org.epsda.bookmanager.service.NoticeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,12 +28,14 @@ import java.util.List;
  */
 @RequestMapping("/notice")
 @RestController
+@PreAuthorize("hasAnyRole('管理员', '普通用户')")
 public class NoticeController {
 
     @Autowired
     private NoticeService noticeService;
 
     @RequestMapping("/query")
+    @PreAuthorize("hasRole('管理员')")
     public ResultWrapper<QueryNoticeResp> queryNotices(@Validated @RequestBody QueryNoticeReq queryNoticeReq) {
         return ResultWrapper.normal(noticeService.queryNotices(queryNoticeReq));
     }
@@ -53,31 +56,37 @@ public class NoticeController {
     }
 
     @RequestMapping("/add")
+    @PreAuthorize("hasRole('管理员')")
     public ResultWrapper<Boolean> addNotice(@Validated @RequestBody Notice notice) {
         return ResultWrapper.normal(noticeService.addNotice(notice));
     }
 
     @RequestMapping("/edit")
+    @PreAuthorize("hasRole('管理员')")
     public ResultWrapper<Boolean> editNotice(@Validated @RequestBody Notice notice) {
         return ResultWrapper.normal(noticeService.editNotice(notice));
     }
 
     @RequestMapping("/delete")
+    @PreAuthorize("hasRole('管理员')")
     public ResultWrapper<Boolean> deleteNotice(@NotNull Long noticeId) {
         return ResultWrapper.normal(noticeService.deleteNotice(noticeId));
     }
 
     @RequestMapping("/batchDelete")
+    @PreAuthorize("hasRole('管理员')")
     public ResultWrapper<Boolean> batchDeleteNotice(@RequestParam List<Long> noticeIds) {
         return ResultWrapper.normal(noticeService.batchDeleteNotice(noticeIds));
     }
 
     @RequestMapping("/publish")
+    @PreAuthorize("hasRole('管理员')")
     public ResultWrapper<Boolean> publishNotice(@NotNull Long noticeId) {
         return ResultWrapper.normal(noticeService.publishNotice(noticeId));
     }
 
     @RequestMapping("/unpublish")
+    @PreAuthorize("hasRole('管理员')")
     public ResultWrapper<Boolean> unpublishNotice(@NotNull Long noticeId) {
         return ResultWrapper.normal(noticeService.unpublishNotice(noticeId));
     }

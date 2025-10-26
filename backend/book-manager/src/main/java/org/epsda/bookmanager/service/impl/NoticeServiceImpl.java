@@ -6,6 +6,7 @@ import org.epsda.bookmanager.constants.Constants;
 import org.epsda.bookmanager.exception.BookManagerException;
 import org.epsda.bookmanager.mapper.NoticeMapper;
 import org.epsda.bookmanager.mapper.UserMapper;
+import org.epsda.bookmanager.pojo.Book;
 import org.epsda.bookmanager.pojo.Notice;
 import org.epsda.bookmanager.pojo.User;
 import org.epsda.bookmanager.pojo.request.QueryNoticeReq;
@@ -15,6 +16,7 @@ import org.epsda.bookmanager.pojo.response.dto.NoticeDisplay;
 import org.epsda.bookmanager.pojo.response.vo.NoticeResp;
 import org.epsda.bookmanager.service.NoticeService;
 import org.epsda.bookmanager.utils.BeanUtil;
+import org.epsda.bookmanager.utils.SecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -46,6 +48,10 @@ public class NoticeServiceImpl implements NoticeService {
 
     @Override
     public QueryNoticeResp queryNotices(QueryNoticeReq queryNoticeReq) {
+        if (Constants.USER_FLAG.equals(SecurityUtil.getRoleIdFromPrinciple())) {
+            throw new BookManagerException("当前用户无权进行公告查询");
+        }
+
         Integer pageNum = queryNoticeReq.getPageNum();
         Integer pageSize = queryNoticeReq.getPageSize();
 
@@ -116,6 +122,9 @@ public class NoticeServiceImpl implements NoticeService {
 
     @Override
     public Boolean addNotice(Notice notice) {
+        if (Constants.USER_FLAG.equals(SecurityUtil.getRoleIdFromPrinciple())) {
+            throw new BookManagerException("当前用户无权进行新增公告");
+        }
         Long userId = notice.getUserId();
         User user = userMapper.selectById(userId);
         if (Constants.USER_UNAVAILABLE_FLAG.equals(user.getDeleteFlag())) {
@@ -131,6 +140,9 @@ public class NoticeServiceImpl implements NoticeService {
 
     @Override
     public Boolean editNotice(Notice notice) {
+        if (Constants.USER_FLAG.equals(SecurityUtil.getRoleIdFromPrinciple())) {
+            throw new BookManagerException("当前用户无权进行编辑公告");
+        }
         Long userId = notice.getUserId();
         User user = userMapper.selectById(userId);
 
@@ -151,6 +163,9 @@ public class NoticeServiceImpl implements NoticeService {
 
     @Override
     public Boolean deleteNotice(Long noticeId) {
+        if (Constants.USER_FLAG.equals(SecurityUtil.getRoleIdFromPrinciple())) {
+            throw new BookManagerException("当前用户无权进行删除公告");
+        }
         Notice notice = noticeMapper.selectById(noticeId);
         if (notice == null) {
             throw new BookManagerException("当前公告不存在，无法删除");
@@ -174,6 +189,9 @@ public class NoticeServiceImpl implements NoticeService {
 
     @Override
     public Boolean publishNotice(Long noticeId) {
+        if (Constants.USER_FLAG.equals(SecurityUtil.getRoleIdFromPrinciple())) {
+            throw new BookManagerException("当前用户无权进行发布公告");
+        }
         Notice notice = noticeMapper.selectById(noticeId);
         if (notice == null || Constants.NOTICE_PUBLISHED.equals(notice.getStatus())) {
             throw new BookManagerException("当前公告不存在，或者公告已经发布，无法二次发布");
@@ -185,6 +203,9 @@ public class NoticeServiceImpl implements NoticeService {
 
     @Override
     public Boolean unpublishNotice(Long noticeId) {
+        if (Constants.USER_FLAG.equals(SecurityUtil.getRoleIdFromPrinciple())) {
+            throw new BookManagerException("当前用户无权进行撤回公告");
+        }
         Notice notice = noticeMapper.selectById(noticeId);
         if (notice == null || Constants.NOTICE_NOT_PUBLISHED.equals(notice.getStatus())) {
             throw new BookManagerException("当前公告不存在，或者公告当前处于未发布，无法取消发布");
