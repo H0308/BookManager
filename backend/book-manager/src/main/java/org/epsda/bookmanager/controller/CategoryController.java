@@ -7,6 +7,7 @@ import org.epsda.bookmanager.pojo.request.QueryCategoryReq;
 import org.epsda.bookmanager.pojo.response.QueryCategoryResp;
 import org.epsda.bookmanager.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +27,7 @@ import java.util.List;
  */
 @RequestMapping("/category")
 @RestController
+@PreAuthorize("hasAnyRole('管理员', '普通用户')")
 public class CategoryController {
 
     @Autowired
@@ -37,11 +39,13 @@ public class CategoryController {
     }
 
     @RequestMapping("/add")
+    @PreAuthorize("hasRole('管理员')")
     public ResultWrapper<Boolean> addCategory(@Validated @RequestBody Category category) {
         return ResultWrapper.normal(categoryService.addCategory(category));
     }
 
     @RequestMapping("/edit")
+    @PreAuthorize("hasRole('管理员')")
     public ResultWrapper<Boolean> editCategory(@Validated @RequestBody Category category) {
         return ResultWrapper.normal(categoryService.editCategory(category));
     }
@@ -52,11 +56,13 @@ public class CategoryController {
     }
 
     @RequestMapping("/delete")
+    @PreAuthorize("hasRole('管理员')")
     public ResultWrapper<Boolean> deleteCategory(@NotNull Long categoryId) {
         return ResultWrapper.normal(categoryService.deleteCategory(categoryId));
     }
 
     @RequestMapping("/batchDelete")
+    @PreAuthorize("hasRole('管理员')")
     public ResultWrapper<Boolean> batchDeleteCategories(@RequestParam List<Long> categoryIds) {
         return ResultWrapper.normal(categoryService.batchDeleteCategories(categoryIds));
     }

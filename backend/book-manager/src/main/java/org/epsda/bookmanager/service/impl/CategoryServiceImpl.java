@@ -11,6 +11,7 @@ import org.epsda.bookmanager.pojo.response.QueryCategoryResp;
 import org.epsda.bookmanager.pojo.response.vo.CategoryResp;
 import org.epsda.bookmanager.service.CategoryService;
 import org.epsda.bookmanager.utils.BeanUtil;
+import org.epsda.bookmanager.utils.SecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -52,6 +53,9 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Boolean addCategory(Category category) {
+        if (!Constants.ADMIN_FLAG.equals(SecurityUtil.getRoleIdFromPrinciple())) {
+            throw new BookManagerException("当前用户无权新增图书分类");
+        }
         // 是否存在过指定的书籍
         Category existedNotDeleted = categoryMapper.selectOne(new LambdaQueryWrapper<Category>().eq(Category::getCategoryName, category.getCategoryName()).eq(Category::getDeleteFlag, Constants.NOT_DELETE_FIELD_FLAG));
         if (existedNotDeleted != null) {
@@ -72,6 +76,9 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Boolean editCategory(Category category) {
+        if (!Constants.ADMIN_FLAG.equals(SecurityUtil.getRoleIdFromPrinciple())) {
+            throw new BookManagerException("当前用户无权编辑图书分类");
+        }
         if (!StringUtils.hasText(category.getCategoryName())) {
             throw new BookManagerException("图书分类名称为空，修改失败");
         }
@@ -86,6 +93,9 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Boolean deleteCategory(Long categoryId) {
+        if (!Constants.ADMIN_FLAG.equals(SecurityUtil.getRoleIdFromPrinciple())) {
+            throw new BookManagerException("当前用户无权删除图书分类");
+        }
         // 先检查当前分类下的图书量是否为0
         Category category = categoryMapper.selectById(categoryId);
         if (category.getCategoryCount() != 0) {
