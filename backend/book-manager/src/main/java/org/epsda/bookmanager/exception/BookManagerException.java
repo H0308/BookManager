@@ -1,6 +1,7 @@
 package org.epsda.bookmanager.exception;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * Created with IntelliJ IDEA.
@@ -12,6 +13,7 @@ import lombok.Data;
  * @Author: 憨八嘎
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class BookManagerException extends RuntimeException{
     public Integer code;
     public String message;
