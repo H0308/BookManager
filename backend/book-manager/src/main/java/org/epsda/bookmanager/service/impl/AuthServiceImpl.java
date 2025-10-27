@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 /**
  * Created with IntelliJ IDEA.
@@ -48,6 +49,13 @@ public class AuthServiceImpl implements AuthService {
         if (Constants.DELETED_FIELD_FLAG.equals(user.getDeleteFlag())) {
             throw new BookManagerException("当前用户已经处于注销状态，无法登录");
         }
+
+        // 普通用户需要输入验证码
+        if (Constants.USER_FLAG.equals(user.getRoleId()) &&
+                (loginReq.getInputCaptcha() == null || !StringUtils.hasText(loginReq.getInputCaptcha()))) {
+            throw new BookManagerException("普通用户需要输入验证码");
+        }
+
         String token = JwtUtil.generateToken(user.getEmail(), user.getUsername());
 
         // 返回登录响应

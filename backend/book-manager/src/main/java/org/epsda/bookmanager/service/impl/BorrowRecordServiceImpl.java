@@ -206,6 +206,11 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
             throw new BookManagerException("当前用户已注销，无法借阅书籍");
         }
 
+        // 判断应还日期是否在借阅日期之前
+        if (borrowRecord.getPreReturnTime().isBefore(borrowRecord.getBorrowTime())) {
+            throw new BookManagerException("应还日期不得早于借阅日期");
+        }
+
         // 可以添加借阅记录
         // 添加借阅
         boolean insertRet = borrowRecordMapper.insert(borrowRecord) == 1;

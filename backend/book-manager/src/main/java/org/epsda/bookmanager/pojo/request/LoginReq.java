@@ -25,4 +25,5 @@ public class LoginReq {
     @NotNull
     @Length(max = 20, message = "密码最长不超过20位")
     private String password;
+    private String inputCaptcha;
 }

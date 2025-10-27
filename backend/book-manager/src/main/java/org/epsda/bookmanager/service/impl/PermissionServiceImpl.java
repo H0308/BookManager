@@ -58,6 +58,7 @@ public class PermissionServiceImpl implements PermissionService {
         List<Long> roleIds = new ArrayList<>();
         roleIds.add(0L);
         String role = queryRoleReq.getRole();
+        Long userId = queryRoleReq.getUserId();
         if (StringUtils.hasText(role)) {
             LambdaQueryWrapper<Role> wrapper = new LambdaQueryWrapper<>();
             wrapper.like(Role::getRole, role);
@@ -67,6 +68,7 @@ public class PermissionServiceImpl implements PermissionService {
         Page<User> pages = userMapper.selectPage(page,
                 new LambdaQueryWrapper<User>().in(StringUtils.hasText(role), User::getRoleId, roleIds)
                         .ne(User::getUsername, adminName)
+                        .ne(User::getId, userId)
                         .ne(User::getDeleteFlag, Constants.USER_UNAVAILABLE_FLAG));
         List<User> records = pages.getRecords();
         for (var record : records) {

@@ -143,7 +143,8 @@ public class BillRecordServiceImpl implements BillRecordService {
             if (billRecord != null) {
                 // 此时说明存在一条账单，直接更新即可
                 billRecord.setBorrowId(borrowId);
-                return billRecordMapper.update(billRecord, new LambdaQueryWrapper<BillRecord>().eq(BillRecord::getUserId, userId)) == 1;
+                return billRecordMapper.update(billRecord,
+                        new LambdaQueryWrapper<BillRecord>().eq(BillRecord::getUserId, userId).eq(BillRecord::getStatus, Constants.BILL_UNPAID_FLAG)) == 1;
             } else {
                 // 此时说明没有账单，直接新建
                 BillRecord newBillRecord = new BillRecord();
