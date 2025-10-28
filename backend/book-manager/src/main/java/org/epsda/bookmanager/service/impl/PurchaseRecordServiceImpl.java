@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.epsda.bookmanager.constants.Constants;
 import org.epsda.bookmanager.exception.BookManagerException;
+import org.epsda.bookmanager.mapper.BillRecordMapper;
 import org.epsda.bookmanager.mapper.BookMapper;
 import org.epsda.bookmanager.mapper.PurchaseRecordMapper;
 import org.epsda.bookmanager.mapper.UserMapper;
@@ -208,12 +209,23 @@ public class PurchaseRecordServiceImpl implements PurchaseRecordService {
         // 如果修改的是读者，那么需要确保该读者有购买书籍的资格
         Long purchaseRecordId = purchaseRecord.getId();
         PurchaseRecord oldPurchaseRecord = purchaseRecordMapper.selectById(purchaseRecordId);
+        Long oldUserId = oldPurchaseRecord.getUserId();
+        User oldUser = userMapper.selectById(oldPurchaseRecord.getUserId());
         Long newUserId = purchaseRecord.getUserId();
         User newUser = userMapper.selectById(newUserId);
+        boolean newUserUpdateRet = true;
+        boolean oldUserUpdateRet = true;
         if (!oldPurchaseRecord.getUserId().equals(newUserId)) {
             if (Constants.DELETED_FIELD_FLAG.equals(newUser.getDeleteFlag())) {
                 throw new BookManagerException("当前用户处于注销状态，无法购买书籍");
             }
+            // 否则修改新读者和旧读者的数据
+            newUser.setPurchaseRecordCount(newUser.getPurchaseRecordCount() + purchaseRecord.getPurchaseCount());
+            oldUser.setPurchaseRecordCount(oldUser.getPurchaseRecordCount() - oldPurchaseRecord.getPurchaseCount());
+            newUserUpdateRet = userMapper.update(newUser, new LambdaQueryWrapper<User>().eq(User::getId, newUserId)) == 0;
+            oldUserUpdateRet = userMapper.update(oldUser, new LambdaQueryWrapper<User>().eq(User::getId, oldUserId)) == 0;
+            // 修改订单记录
+            billRecordService.insertOrUpdateBillRecordWithPurchaseRecord(purchaseRecord);
         }
 
         // 如果修改的是书籍，那么需要确保书籍有被选择的资格
@@ -251,12 +263,11 @@ public class PurchaseRecordServiceImpl implements PurchaseRecordService {
             throw new BookManagerException("当前图书可用数量不足需求量，请修改购买量后重试");
         }
 
-        newUser.setPurchaseRecordCount(purchaseRecord.getPurchaseCount());
         purchaseRecord.setPurchasePrice(newBook.getPrice().multiply(new BigDecimal(purchaseRecord.getPurchaseCount())));
         return purchaseRecordMapper.update(purchaseRecord,
                 new LambdaQueryWrapper<PurchaseRecord>().eq(PurchaseRecord::getId, purchaseRecord.getId())) == 1 &&
                 userMapper.update(newUser, new LambdaQueryWrapper<User>().eq(User::getId, newUserId)) == 1 &&
-                updateBookStatus(newBook);
+                updateBookStatus(newBook) && newUserUpdateRet && oldUserUpdateRet;
     }
 
     @Override

@@ -338,6 +338,8 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
         Long oldUserId = oldBorrowRecord.getUserId();
         Long oldBookId = oldBorrowRecord.getBookId();
         User newUser = userMapper.selectById(newUserId);
+        boolean newUserUpdateRet = true;
+        boolean oldUserUpdateRet = true;
         if (newUser == null) {
             throw new BookManagerException("当前用户不存在，修改失败");
         }
@@ -363,6 +365,16 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
             if (Constants.DELETED_FIELD_FLAG.equals(newUser.getDeleteFlag())) {
                 throw new BookManagerException("当前用户已注销，无法借阅书籍");
             }
+
+            // 没有出现问题后，修改对应用户的借阅数量
+            // 新读者新增
+            newUser.setBorrowRecordCount(newUser.getBorrowRecordCount() + 1);
+            newUserUpdateRet = userMapper.update(newUser,
+                    new LambdaQueryWrapper<User>().eq(User::getId, newUser.getId())) == 1;
+            // 旧读者减少
+            User oldUser = userMapper.selectById(oldUserId);
+            oldUser.setBorrowRecordCount(oldUser.getBorrowRecordCount() - 1);
+            oldUserUpdateRet = userMapper.update(oldUser, new LambdaQueryWrapper<User>().eq(User::getId, oldUser.getId())) == 1;
         }
         // 如果是修改借阅图书，那么需要判断该图书是否满足可借阅条件
         // 1. 图书空闲数量足够
@@ -395,12 +407,13 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
         } else if (Constants.RETURN_FLAG.equals(this.generateStatus(newPreReturnTime, newRealReturnTime))) {
             // 此时说明是已归还状态，仅更新状态即可
             borrowRecord.setStatus(Constants.RETURN_FLAG);
+            return updateBorrowRecordDecreaseUserBorrowCount(borrowRecord, borrowRecord.getId()) && updateBookStatus(book);
         }
 
         // 发起其他情况的修改
         return borrowRecordMapper.update(borrowRecord,
                 new LambdaQueryWrapper<BorrowRecord>().eq(BorrowRecord::getId, borrowRecord.getId())) == 1 &&
-                updateBorrowRecordDecreaseUserBorrowCount(borrowRecord, borrowRecord.getId()) && updateBookStatus(book);
+                newUserUpdateRet && oldUserUpdateRet;
     }
 
     // 计算日期生成罚金
