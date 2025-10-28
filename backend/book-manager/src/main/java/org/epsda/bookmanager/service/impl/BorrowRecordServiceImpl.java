@@ -395,12 +395,12 @@ public class BorrowRecordServiceImpl implements BorrowRecordService {
         } else if (Constants.RETURN_FLAG.equals(this.generateStatus(newPreReturnTime, newRealReturnTime))) {
             // 此时说明是已归还状态，仅更新状态即可
             borrowRecord.setStatus(Constants.RETURN_FLAG);
-            return updateBorrowRecordDecreaseUserBorrowCount(borrowRecord, borrowRecord.getId()) && updateBookStatus(book);
         }
 
         // 发起其他情况的修改
         return borrowRecordMapper.update(borrowRecord,
-                new LambdaQueryWrapper<BorrowRecord>().eq(BorrowRecord::getId, borrowRecord.getId())) == 1;
+                new LambdaQueryWrapper<BorrowRecord>().eq(BorrowRecord::getId, borrowRecord.getId())) == 1 &&
+                updateBorrowRecordDecreaseUserBorrowCount(borrowRecord, borrowRecord.getId()) && updateBookStatus(book);
     }
 
     // 计算日期生成罚金
